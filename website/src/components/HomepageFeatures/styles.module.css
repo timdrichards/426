@@ -1,11 +1,80 @@
 .features {
-  display: flex;
-  align-items: center;
-  padding: 2rem 0;
+  padding: 1.25rem 0 3rem;
   width: 100%;
 }
 
-.featureSvg {
-  height: 200px;
-  width: 200px;
+.headingRow {
+  margin-bottom: 1rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--site-accent-ink);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: clamp(1.35rem, 3vw, 2rem);
+}
+
+.sectionText {
+  margin: 0.5rem 0 0;
+  max-width: 60ch;
+  color: var(--site-muted-ink);
+}
+
+.col {
+  display: flex;
+}
+
+.card {
+  position: relative;
+  width: 100%;
+  padding: 1.15rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(74, 104, 115, 0.12);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(244, 248, 250, 0.76));
+  box-shadow: 0 14px 34px rgba(31, 56, 67, 0.07);
+  overflow: hidden;
+}
+
+.cardGlow {
+  position: absolute;
+  width: 8rem;
+  height: 8rem;
+  top: -2rem;
+  right: -2rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(144, 204, 214, 0.35), rgba(144, 204, 214, 0));
+  pointer-events: none;
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.cardText {
+  margin: 0.55rem 0 0.85rem;
+  color: var(--site-muted-ink);
+}
+
+.cardLink {
+  color: var(--site-link);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.cardLink:hover {
+  text-decoration: underline;
+}
+
+@media screen and (max-width: 996px) {
+  .features {
+    padding-bottom: 2rem;
+  }
 }

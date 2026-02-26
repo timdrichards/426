@@ -19,8 +19,8 @@ const editUrl = repoUrl ? `${repoUrl}/tree/main/website/` : undefined;
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'My Site',
-  tagline: 'Dinosaurs are cool',
+  title: '426 Course Hub',
+  tagline: 'Lecture notes, demos, and reference material',
   favicon: 'img/favicon.ico',
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
@@ -40,6 +40,9 @@ const config = {
   projectName, // Usually your repo name.
 
   onBrokenLinks: 'throw',
+  customFields: {
+    repoUrl,
+  },
 
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
@@ -58,18 +61,7 @@ const config = {
           sidebarPath: './sidebars.js',
           editUrl,
         },
-        blog: {
-          showReadingTime: true,
-          feedOptions: {
-            type: ['rss', 'atom'],
-            xslt: true,
-          },
-          editUrl,
-          // Useful options to enforce blogging best practices
-          onInlineTags: 'warn',
-          onInlineAuthors: 'warn',
-          onUntruncatedBlogPosts: 'warn',
-        },
+        blog: false,
         theme: {
           customCss: './src/css/custom.css',
         },
@@ -86,9 +78,10 @@ const config = {
         respectPrefersColorScheme: true,
       },
       navbar: {
-        title: 'My Site',
+        title: '426',
+        hideOnScroll: true,
         logo: {
-          alt: 'My Site Logo',
+          alt: '426 Course Hub Logo',
           src: 'img/logo.svg',
         },
         items: [
@@ -96,9 +89,8 @@ const config = {
             type: 'docSidebar',
             sidebarId: 'tutorialSidebar',
             position: 'left',
-            label: 'Tutorial',
+            label: 'Docs',
           },
-          {to: '/blog', label: 'Blog', position: 'left'},
           {
             href: repoUrl || 'https://github.com',
             label: 'GitHub',
@@ -110,46 +102,33 @@ const config = {
         style: 'dark',
         links: [
           {
-            title: 'Docs',
+            title: 'Course Site',
             items: [
               {
-                label: 'Tutorial',
+                label: 'Start Here',
                 to: '/docs/intro',
               },
-            ],
-          },
-          {
-            title: 'Community',
-            items: [
               {
-                label: 'Stack Overflow',
-                href: 'https://stackoverflow.com/questions/tagged/docusaurus',
-              },
-              {
-                label: 'Discord',
-                href: 'https://discordapp.com/invite/docusaurus',
-              },
-              {
-                label: 'X',
-                href: 'https://x.com/docusaurus',
+                label: 'Course Structure',
+                to: '/docs/course-structure',
               },
             ],
           },
           {
-            title: 'More',
+            title: 'Workflow',
             items: [
               {
-                label: 'Blog',
-                to: '/blog',
+                label: 'Site Workflow',
+                to: '/docs/site-workflow',
               },
               {
-                label: 'GitHub',
+                label: 'GitHub Repository',
                 href: repoUrl || 'https://github.com',
               },
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()} Tim Richards. Built with Docusaurus.`,
       },
       prism: {
         theme: prismThemes.github,

@@ -1,47 +1,47 @@
 ---
 sidebar_position: 1
+slug: /intro
 ---
 
-# Tutorial Intro
+# Welcome to the 426 Course Hub
 
-Let's discover **Docusaurus in less than 5 minutes**.
+This site is the documentation layer for the `426` repository. It is designed to host course-facing material such as:
 
-## Getting Started
+- lecture references and supporting notes
+- assignment instructions and project guidance
+- setup walkthroughs for tools used in class
+- links into code/demo material stored elsewhere in the repo
 
-Get started by **creating a new site**.
+## Repository layout (current baseline)
 
-Or **try Docusaurus immediately** with **[docusaurus.new](https://docusaurus.new)**.
+- `lectures/`: lecture content, demos, and related course assets
+- `website/`: the Docusaurus site (docs, theme, homepage, build config)
+- `.github/workflows/`: GitHub Actions workflows, including Pages deployment
 
-### What you'll need
+## Editing workflow
 
-- [Node.js](https://nodejs.org/en/download/) version 20.0 or above:
-  - When installing Node.js, you are recommended to check all checkboxes related to dependencies.
-
-## Generate a new site
-
-Generate a new Docusaurus site using the **classic template**.
-
-The classic template will automatically be added to your project after you run the command:
+Run the docs site locally from the `website/` directory:
 
 ```bash
-npm init docusaurus@latest my-website classic
+cd website
+npm install
+npm start
 ```
 
-You can type this command into Command Prompt, Powershell, Terminal, or any other integrated terminal of your code editor.
+Open [http://localhost:3000/426/](http://localhost:3000/426/) (or the local URL Docusaurus prints). Changes in `website/docs` and `website/src` reload automatically.
 
-The command also installs all necessary dependencies you need to run Docusaurus.
+## Publishing
 
-## Start your site
+This repository is configured to deploy the Docusaurus build to GitHub Pages using GitHub Actions when changes are pushed to `main`.
 
-Run the development server:
+- Production URL: [https://timdrichards.github.io/426/](https://timdrichards.github.io/426/)
+- Workflow: `Deploy Docusaurus to GitHub Pages`
 
-```bash
-cd my-website
-npm run start
-```
+## Next recommended content
 
-The `cd` command changes the directory you're working with. In order to work with your newly created Docusaurus site, you'll need to navigate the terminal there.
+Replace this baseline with your course-specific content:
 
-The `npm run start` command builds your website locally and serves it through a development server, ready for you to view at http://localhost:3000/.
-
-Open `docs/intro.md` (this page) and edit some lines: the site **reloads automatically** and displays your changes.
+1. Syllabus / policies
+2. Lecture schedule and links
+3. Assignment and project pages
+4. Setup guides for tooling used in class

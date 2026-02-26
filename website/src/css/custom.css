@@ -1,30 +1,83 @@
-/**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
- */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Manrope:wght@400;500;600;700&display=swap');
 
-/* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
+  --ifm-color-primary: #3d727d;
+  --ifm-color-primary-dark: #376771;
+  --ifm-color-primary-darker: #33616a;
+  --ifm-color-primary-darkest: #2a5057;
+  --ifm-color-primary-light: #467f8b;
+  --ifm-color-primary-lighter: #4b8793;
+  --ifm-color-primary-lightest: #5a9aa6;
   --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --docusaurus-highlighted-code-line-bg: rgba(42, 79, 87, 0.08);
+  --ifm-font-family-base: 'Manrope', 'Avenir Next', 'Segoe UI Variable', 'Helvetica Neue', sans-serif;
+  --ifm-heading-font-family: 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', serif;
+  --ifm-background-color: #f6f7f3;
+  --ifm-navbar-background-color: rgba(246, 247, 243, 0.78);
+  --ifm-footer-background-color: #24353c;
+  --ifm-heading-color: #20343c;
+  --ifm-font-color-base: #22363f;
+  --ifm-link-color: #2e6170;
+  --site-accent-ink: #456f7b;
+  --site-link: #2d6674;
+  --site-muted-ink: #4f6670;
+  --site-subtle-ink: #70838b;
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --ifm-color-primary: #8fc8cd;
+  --ifm-color-primary-dark: #75bcc2;
+  --ifm-color-primary-darker: #69b6bd;
+  --ifm-color-primary-darkest: #45a2ab;
+  --ifm-color-primary-light: #a9d4d8;
+  --ifm-color-primary-lighter: #b6dbde;
+  --ifm-color-primary-lightest: #d2eaec;
+  --docusaurus-highlighted-code-line-bg: rgba(164, 212, 219, 0.13);
+  --ifm-background-color: #18252b;
+  --ifm-background-surface-color: #1d2d34;
+  --ifm-navbar-background-color: rgba(24, 37, 43, 0.82);
+  --ifm-heading-color: #e7f0f1;
+  --ifm-font-color-base: #dbe7e9;
+  --ifm-link-color: #9fd5da;
+  --site-accent-ink: #9fd5da;
+  --site-link: #a8dde2;
+  --site-muted-ink: #bfd0d4;
+  --site-subtle-ink: #9aafb5;
+}
+
+html,
+body {
+  background:
+    radial-gradient(circle at 8% 2%, rgba(182, 222, 210, 0.16), transparent 40%),
+    radial-gradient(circle at 96% 0%, rgba(156, 207, 219, 0.16), transparent 38%),
+    var(--ifm-background-color);
+}
+
+[data-theme='dark'] html,
+[data-theme='dark'] body {
+  background:
+    radial-gradient(circle at 10% 0%, rgba(107, 173, 184, 0.12), transparent 36%),
+    radial-gradient(circle at 95% 0%, rgba(137, 186, 160, 0.1), transparent 34%),
+    var(--ifm-background-color);
+}
+
+.navbar {
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(73, 102, 112, 0.08);
+}
+
+.footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.markdown h1,
+.markdown h2,
+.markdown h3,
+.markdown h4 {
+  letter-spacing: -0.02em;
+}
+
+.theme-doc-markdown pre,
+.theme-code-block {
+  border-radius: 0.9rem;
 }
