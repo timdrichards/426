@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Manrope:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap');
 
 :root {
   --ifm-color-primary: #3d727d;
@@ -11,7 +11,7 @@
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(42, 79, 87, 0.08);
   --ifm-font-family-base: 'Manrope', 'Avenir Next', 'Segoe UI Variable', 'Helvetica Neue', sans-serif;
-  --ifm-heading-font-family: 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', serif;
+  --ifm-heading-font-family: 'Sora', 'Avenir Next', 'Segoe UI Variable', 'Helvetica Neue', sans-serif;
   --ifm-background-color: #f6f7f3;
   --ifm-navbar-background-color: rgba(246, 247, 243, 0.78);
   --ifm-footer-background-color: #24353c;
@@ -74,10 +74,18 @@ body {
 .markdown h2,
 .markdown h3,
 .markdown h4 {
-  letter-spacing: -0.02em;
+  letter-spacing: -0.015em;
+  font-weight: 600;
 }
 
 .theme-doc-markdown pre,
 .theme-code-block {
   border-radius: 0.9rem;
+}
+
+.hero__title,
+.navbar__title,
+.footer__title {
+  font-family: var(--ifm-heading-font-family);
+  font-weight: 600;
 }
