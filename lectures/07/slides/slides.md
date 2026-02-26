@@ -1,11 +1,10 @@
 ---
-# try also 'default' to start simple
 theme: default
 background: https://cover.sli.dev
-title: 5.6 Docker Compose and Service Decomposition
+title: 07 Docker Compose
 info: |
-  ## 5.6 Docker Compose and Service Decomposition
-  Orchestrating multi-container applications with Docker Compose, and how to break down a monolith into services.
+  ## 07 Docker Compose
+  A step-by-step approach to docker compose
 class: text-center
 drawings:
   persist: false
@@ -15,949 +14,753 @@ duration: 75min
 lineNumbers: true
 highlighter: shiki
 ---
-
-# 5.6 Docker Compose and Service Decomposition
+lue
+# 07 Docker Compose
 
 <div class="text-2xl opacity-70 mt-6">
-<p>https://github.com/umass-cs-426/scheduling-app</p>
-<p>5.6-compose-and-service-decomposition</p>
+A Step-by-Step Approach
 </div>
 
 ---
 class: text-2xl
 ---
 
-# Schedule
+# Part 1: Why Docker Compose?
 
-- Homework 1 (to be released today)
-- Exam 1 Thursday (study guide released today)
-  - Focused subset of material
-  - Slides and chosen aspects of the scheduling repository
-  - 20 Multiple choice questions
-  - 50 Minutes Max (expect ~25 min, but you have the entire time)
-  - No surprises
+- Goal: understand the mental model before we start coding
+- We will build a small multi-service app step by step
+- Focus today: practical commands and debugging workflow
 
 ---
 class: text-2xl
 ---
 
-# Material
+# Goals (Part 1)
 
-- **Repository:** [https://github.com/umass-cs-426/scheduling-app](https://github.com/umass-cs-426/scheduling-app)
-- **Branch:** 5.6-compose-and-service-decomposition
-
----
-class: text-2xl
----
-
-# Why Docker Compose Exists
-
-Imagine our scheduling app has 3 containers:
-
-- `web` for UI
-- `api` for business logic
-- `db` for PostgreSQL
-
-Goal: start everything together, wire networking correctly, and repeat the same setup on every machine.
+- Understand what Compose manages
+- Know the difference between image, container, and service
+- See why Compose is useful for multi-service apps
+- Preview the app we will build in this lecture
 
 ---
 class: text-2xl
 ---
 
-# Without Compose: Death by `docker run`
+# Compose Mental Model
 
-Using Docker alone, we must manually remember:
-
-- container start order
-- network creation and service hostnames
-- environment variables and port mappings
-- volume mounts and restart workflow
-
-One typo or missed flag can break the whole stack.
+- `compose.yaml` describes your application
+- A **service** is one role in your app (example: `api`, `web`, `redis`)
+- `docker compose up` creates/runs containers for those services
+- Compose also creates a network so services can talk to each other
 
 ---
 class: text-2xl
 ---
 
-# Now Scale That to 100 API Containers
+# Key Terms
 
-What if we wanted to run 100 API services?
-
-Imagine doing that with your home-cooked, terribly written shell script:
-
-- duplicated command lines everywhere
-- inconsistent env vars and port mappings
-- brittle loops and race conditions
-- painful debugging when only some containers fail
-
-At that point, manual orchestration stops being practical.
+- **Image**: template used to create a container
+- **Container**: running instance of an image
+- **Service**: Compose definition for one container role
+- **Project**: the group of services managed together by Compose
+- **Volume**: persistent storage used by containers
 
 ---
-layout: image
-image: https://commons.wikimedia.org/wiki/Special:FilePath/Cygnus%20explosion.jpg
-backgroundSize: cover
-class: text-white
-transition: fade
+class: text-2xl
 ---
 
-<div class="text-4xl font-bold leading-tight max-w-4xl mt-10">
-"Sure, let's manually start 100 API containers. What could possibly go wrong?"
-</div>
+# Why Not Just `docker run`?
 
-<div class="text-2xl opacity-85 mt-5">
-- Every engineer, 30 seconds before chaos
-</div>
-
----
-layout: full
-class: text-white
-transition: fade
----
-
-<div class="relative w-full h-full overflow-hidden">
-  <div class="fixed inset-0 overflow-hidden">
-    <video
-      autoplay
-      muted
-      loop
-      playsinline
-      class="absolute top-1/2 left-1/2 min-w-full min-h-full max-w-none -translate-x-1/2 -translate-y-1/2"
-      src="https://media.giphy.com/media/4K01QntGeIzXG/giphy.mp4"
-    ></video>
-    <div class="absolute inset-0 bg-black/35"></div>
-  </div>
-  <div class="relative z-10 h-full w-full flex items-center justify-center px-10">
-    <div class="text-6xl font-extrabold leading-tight text-center drop-shadow-lg">
-      This can't be good.
-    </div>
-  </div>
-</div>
+- `docker run` is fine for one container
+- Multi-service apps need lots of flags (ports, env vars, networks, names)
+- Hard to remember and hard to share with teammates
+- Compose gives you one versioned config file and repeatable commands
 
 ---
-class: text-2xl code-lg
+class: text-2xl
 ---
 
-# The Compose Idea
+# What We Will Build (Preview)
 
-Instead of many fragile commands, define the system once:
+- `web` (Express)
+- `api` (Express)
+- `redis` (Redis Official Image)
 
-```yaml
-services:
-  web: { ... }
-  api: { ... }
-  db:  { ... }
-```
+**Flow:**
 
-Then run it with one command:
+- browser -> `web`
+- `web` -> `api`
+- `api` -> `redis`
+
+---
+class: text-2xl
+---
+
+# Command Preview
+
+Having a solid grasp of the `docker compose` commands will allow you to work with multi-service systems with ease. You want to know commands like these without looking them up.
+
+- `docker compose up --build`
+- `docker compose ps`
+- `docker compose logs -f api`
+- `docker compose exec web sh`
+- `docker compose down`
+
+We will take a look at these as we start putting together some services.
+
+---
+class: text-2xl
+---
+
+# Part 2: First Service (`api`)
+
+- Build one small Express app first
+- Put it in a container
+- Run it with Docker Compose
+- Learn the basic `up / ps / logs / down` workflow
+
+---
+class: text-2xl
+---
+
+# Part 2 Goals
+
+- Create a minimal Express `api`
+- Add a simple `Dockerfile`
+- Add a minimal `compose.yaml` with one service
+- Start and inspect the service with Compose commands
+
+---
+class: text-2xl
+---
+
+# Minimal Express API (Example)
+
+- `GET /` returns JSON
+- Keep the code tiny so we can focus on Compose
+
+Example response:
+
+- `{ "message": "hello from api" }`
+
+---
+class: text-2xl
+---
+
+# System Structure
+
+Our system will have the following directory layout:
 
 ```bash
-docker compose up
+.
+├── api/          # code and config for api service
+├── web/          # code and config for web service
+└── compose.yml   # compose file to boot up the system
 ```
 
-Compose is the single source of truth for your local multi-service environment.
-
----
-layout: image
-image: https://media.giphy.com/media/l0MYC0LajbaPoEADu/giphy.gif
-backgroundSize: cover
-class: text-white
-transition: fade
----
-
-<div class="w-full h-full flex items-center justify-center">
-  <div class="text-6xl font-extrabold text-center drop-shadow-lg">
-    Yes, this feels much better
-  </div>
-</div>
-
 ---
 class: text-2xl
 ---
 
-# Docker Compose
-
-- A tool for defining and running multi-container Docker applications.
-- Uses a YAML file to configure the application's services, networks, and volumes.
-- Simplifies the process of managing multiple containers and their interactions.
-- Allows you to start, stop, and manage all services with a single command.
-
-YAML reference: [https://yaml.org/spec/1.2.2/](https://yaml.org/spec/1.2.2/)
-
----
-class: text-2xl
----
-
-# Service Decomposition
-
-- The process of breaking down a monolithic application into smaller, independent services.
-- Each service is responsible for a specific functionality and can be developed, deployed, and scaled independently.
-- Benefits include improved maintainability, scalability, and flexibility.
-
-Modular Monolith -> Service Decomposition -> Microservices
-
----
-class: text-2xl
----
-
-# Example: Scheduling App
-
-- A scheduling application that allows users to create and manage events.
-- Initially developed as a monolithic application.
-- We will decompose it into services using Docker Compose.
-
-- Services:
-  - `web`: The frontend application.
-  - `api`: The backend API that handles business logic and data storage.
-  - `db`: The database service for storing event data.
-
----
-class: text-2xl
----
-
-# Approach
-
-- First, we will use docker compose with our modular monolith
-- Then, we will decompose the monolith into services and update our docker compose incrementally
-
----
-class: text-2xl
----
-
-# Docker Compose with Modular Monolith
-
-- A `docker-compose.yml` file is created to define the services
-- In this case, we will have a single service for the monolith, which includes both the frontend and backend components.
-
-```yaml {1|1-2|1-3|4-5|6-7|8-9|1,3,4,6,8}
-services:
-  app:
-    build: .
-    ports:
-      - '3000:3000'
-    volumes:
-      - .:/app
-    environment:
-      - NODE_ENV=development
-```
-
-<!-- TODO: Need to implement this file. -->
-
-
----
-class: text-2xl
----
-
-# Building the Application
-
-- Before we run the system, we need to build it.
-- We use the `docker compose build` command.
-  - Reads the `docker-compose.yml` file
-  - For each service, it builds the associated Docker image
-  - Or it pulls an existing image from a registry (e.g., Docker Hub)
-
-In our case, we will build the single image for the monolith.
+# Suggested `api` Files
 
 ```bash
-docker compose build
+api/
+├── package.json
+├── server.js
+└── Dockerfile
 ```
 
-<!-- TODO: record a cast of running this command -->
+This is enough for the first Compose demo.
+
+We use JavaScript for simplicity.
 
 ---
 class: text-2xl
 ---
 
-# Running the Application
-
-After building the application, we can run it using the `docker compose up` command. This is similar to running `docker run` for a single container, but it will handle all the services defined in the `docker-compose.yml` file.
-
-```bash
-docker compose up
-```
-
-The application will be accessible at [http://localhost:3000](http://localhost:3000).
-
-To bring the system down, type in `Ctrl-C` in the terminal.
-
-<!-- TODO: record a cast of running this command -->
-
----
-class: text-2xl
----
-
-# Detached Mode
-
-Detached mode allows you to run the application in the background, freeing up your terminal for other tasks. This is typically how we want to run our applications in production, and it can be useful during development as well.
-
-```bash
-docker compose up -d
-```
-
-Starts the containers in the background
-
----
-class: framed-lists
----
-
-# Fundamental Commands
-
-There are many commands available in Docker Compose, but here are some of the most commonly used ones to get you started.
-
-- `docker-compose up`: Starts containers defined in `docker-compose.yml`
-- `docker-compose down`: Stops containers
-- `docker-compose build`: Builds or rebuilds services
-- `docker-compose logs`: View output from containers
-- `docker-compose ps`: List containers
-- `docker-compose exec`: Execute a command in a running container
-- `docker-compose stop`: Stop services
-- `docker-compose start`: Start existing containers for a service
-
----
-class: text-2xl
-zoom: 0.9
-transition: fade
----
-
-# Fundamental Commands Lifecycle
-
-```mermaid
-flowchart LR
-  A[Compose file] --> B[docker compose up]
-  B --> C[Running containers]
-  C --> D[docker compose logs / ps / exec]
-  C --> E[docker compose stop]
-  E --> F[Stopped containers]
-  F --> G[docker compose start]
-  G --> C
-  C --> H[docker compose down]
-  H --> I[Removed containers + network]
-```
-
----
-class: text-2xl
-zoom: 1.05
-transition: fade
----
-
-# Lifecycle Focus: Start and Observe
-
-```mermaid
-flowchart LR
-  A[Compose file] --> B[docker compose up]
-  B --> C[Running containers]
-  C --> D[docker compose logs]
-  C --> E[docker compose ps]
-  C --> F[docker compose exec]
-```
-
----
-class: text-2xl
-zoom: 1.05
-transition: fade
----
-
-# Lifecycle Focus: Pause, Resume, Remove
-
-```mermaid
-flowchart LR
-  C[Running containers] --> E[docker compose stop]
-  E --> F[Stopped containers]
-  F --> G[docker compose start]
-  G --> C
-  C --> H[docker compose down]
-  H --> I[Removed containers + network]
-```
-
----
-class: text-2xl
----
-
-# Logs
-
-Like with Docker, you can view the logs of your services using `docker-compose logs`. This will show you the combined logs of all services defined in your `docker-compose.yml` file. 
-
-```bash
-docker compose logs
-```
-
-You can also specify a particular service to view its logs: 
-- `docker-compose logs <service-name>`.
-
----
-class: text-2xl
----
-
-# Listing Containers
-
-To see a list of all running services defined in `docker-compose.yml`, you can use the `compose ps` sub-command.
-
-```bash
-docker compose ps
-```
-
-- Lists all composed services
-- Shows their status and current state
-- Useful for debugging
-
-
----
-class: text-2xl
----
-
-# Stopping Services
-
-Sometimes you may want to stop the services without removing them, especially during development when you may want to pause the application to make changes or debug without losing the current state of the containers.
-
-```bash
-docker compose stop
-```
-
-This will stop/pause the running containers.
-
-- Stopping services allows you to temporarily halt the application without losing any data or configuration.
-- You can start the services again later without needing to rebuild or reconfigure them.
-- This is useful during development when you may want to pause the application to make changes or debug without losing the current state of the containers.
-
----
-class: text-2xl
----
-
-# Starting Services
-
-```bash
-docker compose start
-```
-
-This starts containers that were previously created and stopped.
-
-- `start` does not rebuild images
-- `start` does not recreate containers
-- Use it after `docker compose stop` when you want a fast resume
-
-If your compose file changed (ports/env/services), use `docker compose up -d` instead.
-
----
-class: text-2xl
----
-
-# Restarting Services
-
-Use `restart` when a service is running but needs a reset.
-
-```bash
-docker compose restart
-```
-
-- Restarts all services in the project
-- Use `docker compose restart api` to target one service
-- Faster than tearing down the whole stack
-
----
-class: text-2xl
----
-
-# Tearing Down the Stack
-
-When you are done, remove the running stack cleanly:
-
-```bash
-docker compose down
-```
-
-- Stops containers
-- Removes project network
-- Keeps named volumes by default
-
-Use `docker compose down -v` only when you want to delete persisted data.
-
----
-class: text-2xl
----
-
-# Executing Commands in a Running Service
-
-`exec` lets you run a command inside a running container.
-
-```bash
-docker compose exec app sh
-```
-
-- Great for debugging environment/files
-- Can run scripts directly (`npm test`, `ls`, etc.)
-- Service must already be running
-
----
-class: text-2xl
----
-
-# One-Off Commands with `run`
-
-Use `run` for temporary tasks that should not modify the main service lifecycle.
-
-```bash
-docker compose run --rm app npm run migrate
-```
-
-- Creates a new throwaway container
-- Useful for migrations, seed scripts, ad-hoc jobs
-- `--rm` removes the container after completion
-
----
-class: text-2xl
----
-
-# Following Logs Live
-
-For active debugging, tail logs continuously:
-
-```bash
-docker compose logs -f app
-```
-
-- `-f` follows new log lines
-- Omit service name to stream all services
-- Add `--tail=100` to limit initial output
-
----
-class: text-2xl
----
-
-# Decomposition Goal
-
-Next step: split our monolith into service boundaries.
-
-- `web` serves UI
-- `api` handles business logic
-- `db` persists data
-
-Compose gives us one place to define how these pieces run together.
-
-<!-- TODO: Need to go through how we decompose the code. -->
-
----
-class: text-2xl code-lg
----
-
-# Add the Database Service
-
-Start by extracting persistence to PostgreSQL:
-
-```yaml
-services:
-  db:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_DB: scheduling
-      POSTGRES_USER: appuser
-      POSTGRES_PASSWORD: devpass
-    ports:
-      - '5432:5432'
-```
-
-Now data storage is explicit and independently manageable.
-
----
-class: text-2xl code-lg
-zoom: 0.92
----
-
-# Add the API Service
-
-Move backend logic into its own container:
-
-```yaml
-services:
-  api:
-    build:
-      context: .
-      dockerfile: Dockerfile.api
-    environment:
-      DATABASE_URL: postgres://appuser:devpass@db:5432/scheduling
-      NODE_ENV: development
-    depends_on:
-      - db
-    ports:
-      - '3001:3001'
-```
-
-API connects to Postgres at `db:5432` using Compose DNS.
-
----
-class: text-2xl code-lg
----
-
-# Add the Web Service
-
-Front-end becomes a separate deployable unit:
-
-```yaml
-services:
-  web:
-    build:
-      context: .
-      dockerfile: Dockerfile.web
-    environment:
-      VITE_API_BASE_URL: http://api:3001
-    depends_on:
-      - api
-    ports:
-      - '3000:3000'
-```
-
-Now UI and API can evolve independently.
-
----
-class: text-2xl
----
-
-# Service Startup and Readiness
-
-`depends_on` controls order, not readiness.
-
-- API may start before DB is ready to accept connections
-- Add retry logic in app startup
-- Prefer health checks for better orchestration signals
-
-Compose helps sequence services, but resilient apps handle transient failures.
-
----
-class: text-2xl
-zoom: 0.92
----
-
-# Startup vs Readiness Sequence
-
-```mermaid
-sequenceDiagram
-  participant C as Compose
-  participant A as API
-  participant D as DB
-  C->>D: start db container
-  C->>A: start api container (depends_on order)
-  A->>D: connect attempt
-  D-->>A: not ready yet
-  A->>A: retry with backoff
-  D-->>A: ready
-  A->>D: connect succeeds
-```
-
----
-class: text-2xl code-lg
----
-
-# Persist Database Data with Volumes
-
-Named volumes keep data across container recreation:
-
-```yaml
-services:
-  db:
-    image: postgres:16-alpine
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-
-volumes:
-  pgdata:
-```
-
-Without this, `docker compose down -v` and container replacement can wipe local state.
-
----
-class: text-2xl
----
-
-# Docker Volumes: Named Volumes
-
-Named volumes are managed by Docker and are best for persistent app data.
-
-```yaml
-services:
-  db:
-    image: postgres:16-alpine
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-
-volumes:
-  pgdata:
-```
-
-- Best for databases and durable service data
-- Not tied to a specific host path
-- Easy to reuse across container recreations
-
----
-class: text-2xl
----
-
-# Docker Volumes: Bind Mounts (Host Path)
-
-Bind mounts map a host folder directly into a container path.
-
-```yaml
-services:
-  api:
-    build: .
-    volumes:
-      - ./src:/app/src
-```
-
-- Best for local development and live-edit workflows
-- Changes on host appear immediately in container
-- Less portable across machines than named volumes
-
----
-layout: two-cols
-layoutClass: cols-67-33
-class: text-2xl
----
-
-# Internal Networking and DNS
-
-Compose creates a project network automatically.
-
-- Each service name is a DNS hostname
-- `api` can reach DB using `db:5432`
-- `web` can reach API using `api:3001`
-
-You usually do not need custom networks for simple projects.
-
-::right::
-
-```mermaid
-flowchart LR
-  subgraph N[compose default network]
-    W[web service]
-    A[api service]
-    D[db service]
-  end
-  W -->|http://api:3001| A
-  A -->|postgres://db:5432| D
-```
-
----
-class: text-2xl
----
-
-# Scale Stateless Services
-
-For stateless tiers (typically `web`), scale replicas:
-
-```bash
-docker compose up -d --scale web=3
-```
-
-- Useful for load tests and concurrency demos
-- Avoid scaling stateful services (like DB) this way
-- Add a reverse proxy when you need controlled traffic routing
-
-[We will talk more about this at a later time.]{ .sentence-emphasis }
-
----
-class: text-2xl framed-lists-amber
----
-
-# ☑ Troubleshooting Checklist
-
-When things fail, check in this order:
-
-- `docker compose ps` for container state
-- `docker compose logs -f <service>` for errors
-- `docker compose config` for YAML/env issues
-- Port collisions on host (`3000`, `3001`, `5432`)
-- Bad connection strings or missing env vars
-
-Most startup issues are config or networking mismatches.
-
----
-class: text-2xl
----
-
-# Reference Links
-
-Official Docker docs used in this module:
-
-- [Docker Compose guide](https://docs.docker.com/guides/docker-compose/)
-- [Compose file reference](https://docs.docker.com/compose/compose-file/)
-- [Compose volumes reference](https://docs.docker.com/reference/compose-file/volumes/)
-- [`docker compose up` reference](https://docs.docker.com/reference/cli/docker/compose/up/)
-- [`docker compose down` reference (`-v` / `--volumes`)](https://docs.docker.com/reference/cli/docker/compose/down/)
-- [`docker compose logs` reference](https://docs.docker.com/reference/cli/docker/compose/logs/)
-- [`docker compose exec` reference](https://docs.docker.com/compose/reference/exec)
-- [Bind mounts](https://docs.docker.com/engine/storage/bind-mounts/)
-- [Storage overview (volumes vs bind mounts)](https://docs.docker.com/engine/storage/)
-
----
-class: text-2xl
----
-
-# Activity: Debug Then Extend
-
-You will work with a small Compose app that has 3 services:
-
-- `web` (frontend)
-- `api` (backend)
-- `db` (postgres)
-
-Part 1: find and fix a startup failure.
-
-Part 2: add a 4th service and integrate it with minor changes.
-
----
-class: text-2xl
----
-
-# Activity Setup
-
-Timebox:
-
-- Part 1 (debug + fix): 15-20 min
-- Part 2 (extend system): 20-25 min
-- Debrief: 10 min
-
-Rules:
-
-- Use Compose commands first (`ps`, `logs`, `exec`, `config`)
-- Keep changes minimal and focused
-- Be ready to explain root cause and fix path
-
----
-class: text-2xl code-lg
----
-
-# Part 1: Broken System
-
-Run this first:
-
-```bash
-docker compose up -d
-docker compose ps
-docker compose logs -f api
-```
-
-You should see a clear runtime error in API logs, but the root cause is not immediately obvious from the web UI.
-
----
-class: text-2xl code-lg
----
-
-# Part 1: Compose File (With Bug)
-
-```yaml
-services:
-  web:
-    build: ./web
-    environment:
-      API_BASE_URL: http://api:3001
-    depends_on: [api]
-    ports: ['3000:3000']
-
-  api:
-    build: ./api
-    environment:
-      DATABASE_URL: postgres://appuser:devpass@database:5432/appdb
-    depends_on: [db]
-    ports: ['3001:3001']
-
-  db:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_DB: appdb
-      POSTGRES_USER: appuser
-      POSTGRES_PASSWORD: devpass
-```
-
----
-class: text-2xl
----
-
-# Part 1: Investigation Checklist
-
-Use this flow:
-
-- Confirm service state: `docker compose ps`
-- Find failing service logs: `docker compose logs api`
-- Verify service names in compose vs connection strings
-- Confirm network reachability from API container
-- Apply minimal fix and re-run
-
-Goal: explain why the error happens, not just what to change.
-
----
-class: text-2xl framed-lists-green
----
-
-# Part 1: Expected Fix
-
-- Root cause: `DATABASE_URL` references host `database`
-- Compose service name is `db`, so DNS lookup fails
-- Error is obvious (`ENOTFOUND` or connection failure), source is subtle
-- Fix: change connection string host from `database` -> `db`
-- Validate with:
-  - `docker compose up -d --build`
-  - `docker compose ps`
-  - `docker compose logs api`
-
----
-class: text-2xl
----
-
-# Part 2: Extend with New Service
-
-Add a `notifier` service:
-
-- Exposes `POST /notify`
-- Logs the message payload
-- Returns `{ ok: true }`
-
-Integrate it so API sends a notify call when a new event is created.
-
-Keep it simple: no queues, no auth, no persistence.
-
----
-class: text-2xl code-lg
----
-
-# Part 2: Minimal Integration Changes
-
-Compose additions:
-
-```yaml
-services:
-  notifier:
-    build: ./notifier
-    ports: ['3002:3002']
-
-  api:
-    environment:
-      DATABASE_URL: postgres://appuser:devpass@db:5432/appdb
-      NOTIFIER_URL: http://notifier:3002
-    depends_on: [db, notifier]
-```
-
-API route sketch:
+# `api/server.js`
 
 ```js
-await fetch(`${process.env.NOTIFIER_URL}/notify`, {
-  method: 'POST',
-  headers: { 'content-type': 'application/json' },
-  body: JSON.stringify({ type: 'event.created', id: event.id }),
+import express from 'express';
+
+const app = express()
+const port = 3000
+
+app.get('/', (req, res) => {
+  res.json({ message: 'hello from api' })
+})
+
+app.listen(port, () => {
+  console.log(`API listening on port ${port}`)
 })
 ```
 
 ---
-class: text-2xl framed-lists-blue
+class: text-2xl
 ---
 
-# Deliverables
+# `api/package.json`
 
-- Short root-cause note for Part 1:
-  - symptom
-  - true cause
-  - exact fix
-- Working compose stack with new `notifier` service
-- Evidence:
-  - `docker compose ps` output
-  - API logs showing successful DB connection
-  - Notifier logs showing received event notifications
+```json
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": { "start": "node server.js" },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
 
-Stretch goal: update `web` to display a "notification sent" status.
+```
+
+---
+class: text-2xl
+---
+
+# Minimal `Dockerfile` (API)
+
+- Use a Node base image
+- Copy package files and install dependencies
+- Copy app code
+- Start the server
+
+---
+class: text-2xl
+---
+
+# `api/Dockerfile` (Contents)
+
+```dockerfile
+FROM node:25-alpine           # Base Node.js Image
+WORKDIR /app                  # Create /app in image; cd to /app
+COPY package*.json ./         # Copy package*.json files into /app
+RUN npm install               # Install dependencies
+COPY . .                      # Copy the rest into image
+EXPOSE 3000                   # Hint that this service uses port 3000
+CMD ["npm", "start"]          # Run the server
+```
+
+---
+class: text-2xl
+---
+
+# Minimal `compose.yaml` (One Service)
+
+- One service: `api`
+- Build from `./api`
+- Map port `3000:3000`
+
+Key idea:
+
+- Compose service name is `api`
+
+---
+class: text-2xl
+---
+
+# `compose.yml` (Contents)
+
+```yaml
+services:
+  api:
+    build: ./api
+    ports:
+      - "3000:3000"
+```
+
+To boot this system:
+
+```bash
+docker compose up
+```
+
+---
+class: text-2xl
+---
+
+# Boot System #1: `docker compose up`
+
+<Asciinema src="/casts/01-compose-up" :rows="16" />
+
+
+---
+class: text-2xl
+---
+
+# First Commands to Demo
+
+- `docker compose up --build`: rebuilds all images before boot up
+- `docker compose up -d`: compose services in detached mode
+- `docker compose ps`: show service containers under this compose
+- `docker compose logs -f api`: streams api service log
+- `docker compose down`: stops all containers and removes them
+
+We will look at these in the order above.
+
+---
+class: text-2xl
+---
+
+# What `up --build` Is Doing
+
+- Builds the API image (from `api/Dockerfile`)
+- Creates the `api` container
+- Starts the container
+- Attaches logs to your terminal (unless `-d`)
+
+<Asciinema src="/casts/02-compose-up-build" :rows="10" />
+
+---
+class: text-2xl
+---
+
+# What to Point Out in `ps`
+
+- Service name (`code-api-1`)
+- Container status (`running`, `exited`)
+- Port mapping (`0.0.0.0:3000->3000/tcp`)
+
+This is a quick way to test the health of your system.
+
+<Asciinema src="/casts/03-compose-ps" :rows="20" />
+
+---
+class: text-2xl
+---
+
+# What to Point Out in `logs`
+
+- App startup line (example: "Server listening on 3000")
+- Request logs after hitting `GET /`
+- How logs help debug "it started but doesn't work"
+
+<Asciinema src="/casts/04-compose-logs" :rows="20" />
+
+---
+class: text-2xl
+---
+
+# Quick Test
+
+- Open browser: `http://localhost:3000`
+- Or run: `curl http://localhost:3000`
+
+JSON response expected from the API service:
+```json
+{ 'message': 'hello from api' }
+```
+
+<Asciinema src="/casts/05-health-check" :rows="10" />
+
+---
+class: text-2xl
+---
+
+# Common Mistakes
+
+- App listens on wrong port inside container (check log)
+- Wrong `CMD` in `Dockerfile` (check log)
+- Forgot `--build` after changing Dockerfile/dependencies (rebuild)
+- Port `3000` already in use on host (Error: `EADDRINUSE` for Node)
+
+---
+class: text-2xl
+---
+
+# Part 2 Wrap-Up
+
+```mermaid
+flowchart LR
+  B[Browser / curl] --> A["api (Express)"]
+```
+
+- We now have one Express service running with Compose
+- We know the basic lifecycle commands
+- Next: add a second service (`web`) and service-to-service networking
+
+---
+class: text-2xl
+---
+
+# Part 3: Add `web` Service
+
+- Add a second Express service: `web`
+- `web` will call `http://api:3000`
+- Show Compose networking by service name
+- Introduce `exec` and `restart`
+
+---
+class: text-2xl
+---
+
+# Part 3 Goals
+
+- Add `web` to `compose.yml`
+- Run both services together
+- Demonstrate service-name DNS (`api`)
+- Use `docker compose exec web sh`
+- Use `docker compose restart api`
+
+---
+class: text-2xl
+---
+
+# Updated System (Part 3)
+
+```mermaid
+flowchart LR
+  B[Browser / curl] -- 3000 --> W["web (Express)"]
+  W -- 3001 --> A["api (Express)"]
+```
+
+- Browser talks to `web`
+- `web` talks to `api` using the service name
+
+---
+class: text-2xl
+---
+
+# Suggested `web` Files
+
+```bash
+web/
+├── package.json
+├── server.js
+└── Dockerfile
+```
+
+This mirrors the `api/` service structure.
+
+---
+class: text-2xl
+---
+
+# `web/server.js` (Contents)
+
+````md magic-move
+
+```js
+import express from 'express'
+```
+
+```js
+import express from 'express'
+
+const app = express()
+const port = 3001
+```
+
+```js
+import express from 'express'
+
+const app = express()
+const port = 3001
+
+app.get('/', async (req, res) => {
+
+})
+
+app.listen(port, () => {
+  console.log(`Web listening on port ${port}`)
+})
+```
+
+```js
+import express from 'express'
+
+const app = express()
+const port = 3001
+
+app.get('/', async (req, res) => {
+  // The fetch() function sends HTTP requests (defaults to GET).
+  // The general form of the function is:
+  //   fetch(URL, params)
+  const response = await fetch('http://api:3000')
+  // Note the use of "api" as the domain name! Thank you Docker.
+})
+
+app.listen(port, () => {
+  console.log(`Web listening on port ${port}`)
+})
+```
+
+```js
+import express from 'express'
+
+const app = express()
+const port = 3001
+
+app.get('/', async (req, res) => {
+  // The fetch() function sends HTTP requests (defaults to GET).
+  const response = await fetch('http://api:3000')
+  const data = await response.json()
+  // We use await for both calls as they are asynchronous calls
+})
+
+app.listen(port, () => {
+  console.log(`Web listening on port ${port}`)
+})
+```
+
+```js
+import express from 'express'
+
+const app = express()
+const port = 3001
+
+app.get('/', async (req, res) => {
+  const response = await fetch('http://api:3000')
+  const data = await response.json()
+  // We respond with some simple HTML
+  res.send(`<h1>Web</h1><pre>${JSON.stringify(data, null, 2)}</pre>`)
+})
+
+app.listen(port, () => {
+  console.log(`Web listening on port ${port}`)
+})
+```
+````
+
+---
+class: text-2xl
+---
+
+# `web/Dockerfile` (Contents)
+
+```dockerfile {1-7|6}
+FROM node:25-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+EXPOSE 3001
+CMD ["npm", "start"]
+```
+
+<v-click at="+0">
+
+**NOTE:** This `Dockerfile` is identical as the one for the `api` service. The only real difference here is the port `3001` used by the `EXPOSE` directive.
+
+</v-click>
+
+---
+class: text-2xl
+---
+
+# `compose.yml` (Two Services)
+
+```yaml
+services:
+  api:
+    build: ./api
+    ports:
+      - "3000:3000"
+
+  web:
+    build: ./web
+    ports:
+      - "3001:3001"
+```
+
+- Not much difference between the two service definitions.
+- This is not always the case.
+
+---
+class: text-2xl
+---
+
+# Key Concept: Service Name DNS
+
+- `web` can call `http://api:3000`
+- `api` is the Compose service name
+- No hard-coded IP addresses needed
+- No custom network setup needed
+
+---
+class: text-2xl
+---
+
+# Boot System #2
+
+The version of our system with only the `app` service is still running. We can either bring the system down and then bring it back up again, or we can just bring up the new service while the system is running.
+
+**Option #1**
+
+```bash
+docker compose down
+docker compose up
+```
+
+**Option #2**
+
+```bash
+docker compose up web
+```
+
+---
+class: text-2xl
+---
+
+# Health Check System #2
+
+After adding a new service, it is always good to quick check the health.
+
+We can run `docker compose ps`, but the output is a bit verbose. What if we only want to know the service, state, and mapped ports?
+
+Fortunately, we can customize the output format:
+
+```bash
+docker compose ps --format "table {{.Service}}\t{{.State}}\t{{.Ports}}"
+```
+
+Output:
+
+```bash
+SERVICE   STATE     PORTS
+api       running   0.0.0.0:3000->3000/tcp
+web       running   0.0.0.0:3001->3001/tcp
+```
+
+---
+class: text-2xl
+---
+
+# Commands to Demo (Part 3)
+
+Let us check out some of these commands in our current setup.
+
+```mermaid
+flowchart LR
+  B[Browser / curl] -- 3000 --> W["web (Express)"]
+  W -- 3001 --> A["api (Express)"]
+```
+
+- `docker compose up --build`
+- `docker compose ps`
+- `docker compose exec web sh`
+- `docker compose restart api`
+- `docker compose logs -f web`
+
+---
+class: text-2xl
+---
+
+# Demo: `exec` Into `web`
+
+- Run: `docker compose exec web sh`
+- Verify service DNS from inside container
+- Example checks:
+  - `wget -qO- http://api:3000`
+  - `ping api` (if available)
+
+Point: containers can reach each other by service name.
+
+<Asciinema src="/casts/06-exec-web-sh" :rows="6" />
+
+---
+class: text-2xl
+---
+
+# Demo: Restart `api`
+
+- Run: `docker compose restart api`
+- Watch what happens in `web` and `api` logs
+- Refresh `http://localhost:3001`
+
+```bash
+docker compose logs api                                    main ~1 ?18   10s
+api-1  | API SERVICE listening on port 3000
+api-1  | API SERVICE listening on port 3000
+api-1  | API SERVICE listening on port 3000
+```
+
+Teaching point:
+
+- Compose manages services independently inside one project
+
+---
+class: text-2xl
+layout: two-cols
+---
+
+# Quick Test (Part 3)
+
+- Open browser: `http://localhost:3001`
+- `web` should fetch data from `api`
+
+Expected outcome:
+
+- HTML page from `web`
+- Embedded JSON from `api`
+
+::right::
+
+![web display](/images/shot-01.png)
+
+---
+class: text-2xl
+---
+
+# Common Mistakes (Part 3)
+
+- `web` tries `localhost:3000` instead of `api:3000`
+- `web` port mapping missing (`3001:3001`)
+- `api` not rebuilt after code changes
+- Looking at the wrong service logs
+
+---
+class: text-2xl
+---
+
+# Part 3 Wrap-Up
+
+```mermaid
+flowchart LR
+  B[Browser / curl] -- 3000 --> W["web (Express)"]
+  W -- 3001 --> A["api (Express)"]
+```
+
+- We now have two services in one Compose project
+- We see service-name networking in action
+
+---
+class: text-2l
+---
+
+# In-Class Activity (~15 minutes)
+
+```mermaid
+flowchart LR
+  B[Browser / curl] -- 3000 --> W["web (Express)"]
+  W -- 3001 --> A["api (Express)"]
+  W -- 3002 --> P["people (Express)"]
+```
+
+Your task is to **work collaboratively** to add a new service to our current system called `people`. This service simply returns HTML that lists the name of each person you are working with.
+
+- Download the code used today from the corresponding Canvas activity.
+- Update the project to include the new service.
+- Screenshot the output rendered in the browser.
+- If you can't get it to work, screenshot your service code and Dockerfile
+- Submit to Canvas.
+
+
+
+---
+class: text-2xl
+---
+
+# Next Time
+
+- We need to expand our understanding of compose
+- Do we really need different port numbers?
+- Add Redis for shared state and failure testing
+- Add a worker service to get the job done
+- Add volumes to persist state
