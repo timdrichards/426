@@ -5,10 +5,13 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 
 const props = defineProps(['src', 'rows'])
 const playerContainer = ref(null)
+const player = ref(null)
+let visibilityObserver
+let hasStartedOnce = false
 
 const loadAsset = (tag, attributes) => {
   return new Promise(resolve => {
@@ -33,12 +36,36 @@ onMounted(async () => {
 
   // Initialize once loaded
   if (window.AsciinemaPlayer) {
-    window.AsciinemaPlayer.create(props.src, playerContainer.value, {
+    player.value = window.AsciinemaPlayer.create(props.src, playerContainer.value, {
       rows: props.rows || 20,
-      autoPlay: true,
+      // Don't auto-play on mount; Slidev may pre-render slides off-screen.
+      autoPlay: false,
       preload: true,
     })
+
+    // Start from the beginning the first time this slide becomes visible.
+    visibilityObserver = new IntersectionObserver(
+      entries => {
+        const isVisible = entries.some(entry => entry.isIntersecting && entry.intersectionRatio > 0.5)
+        if (!isVisible || hasStartedOnce || !player.value) return
+
+        hasStartedOnce = true
+        try {
+          player.value.seek(0)
+          player.value.play()
+        } catch {
+          // Fallback if the player API differs across versions.
+        }
+      },
+      { threshold: [0.5] }
+    )
+
+    visibilityObserver.observe(playerContainer.value)
   }
+})
+
+onBeforeUnmount(() => {
+  visibilityObserver?.disconnect()
 })
 </script>
 

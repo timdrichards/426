@@ -14,7 +14,7 @@ duration: 75min
 lineNumbers: true
 highlighter: shiki
 ---
-lue
+
 # 07 Docker Compose
 
 <div class="text-2xl opacity-70 mt-6">
@@ -48,7 +48,7 @@ class: text-2xl
 
 # Compose Mental Model
 
-- `compose.yaml` describes your application
+- `compose.yml` describes your application
 - A **service** is one role in your app (example: `api`, `web`, `redis`)
 - `docker compose up` creates/runs containers for those services
 - Compose also creates a network so services can talk to each other
@@ -80,17 +80,33 @@ class: text-2xl
 class: text-2xl
 ---
 
+# Why This Lecture Matters
+
+- Compose gives us the same mini-system setup on every student machine
+- We can add services gradually and observe how the whole system changes
+- We can restart or break one service and study the impact on others
+- Later topics (Redis, workers, failures, state) reuse this exact workflow
+
+**Compose is our local systems laboratory.**
+
+Today is foundation work for the systems questions we care about.
+
+---
+class: text-2xl
+---
+
 # What We Will Build (Preview)
+
+A two-service system to start.
 
 - `web` (Express)
 - `api` (Express)
-- `redis` (Redis Official Image)
 
 **Flow:**
 
-- browser -> `web`
-- `web` -> `api`
-- `api` -> `redis`
+- browser → `web`
+- `web` → `api`
+- Next time: `api` → `redis`
 
 ---
 class: text-2xl
@@ -98,13 +114,14 @@ class: text-2xl
 
 # Command Preview
 
-Having a solid grasp of the `docker compose` commands will allow you to work with multi-service systems with ease. You want to know commands like these without looking them up.
+Having a solid grasp of the `docker compose` commands will allow you to work with multi-service systems with ease. In this course, these commands are not the end goal; they are the tools we use to inspect and experiment on systems.
 
-- `docker compose up --build`
-- `docker compose ps`
-- `docker compose logs -f api`
-- `docker compose exec web sh`
-- `docker compose down`
+- `docker compose up --build` → "Can I reproduce the system?"
+- `docker compose ps` → "What is running/exposed?"
+- `docker compose logs -f api` → "Where is the failure"
+- `docker compose exec web sh` → "Can services reach each other?"
+- `docker compose down` → "Can the system shutdown gracefully?"
+- `docker compose restart` → "How does one service failure affect others?"
 
 We will take a look at these as we start putting together some services.
 
@@ -127,7 +144,7 @@ class: text-2xl
 
 - Create a minimal Express `api`
 - Add a simple `Dockerfile`
-- Add a minimal `compose.yaml` with one service
+- Add a minimal `compose.yml` with one service
 - Start and inspect the service with Compose commands
 
 ---
@@ -251,7 +268,7 @@ CMD ["npm", "start"]          # Run the server
 class: text-2xl
 ---
 
-# Minimal `compose.yaml` (One Service)
+# Minimal `compose.yml` (One Service)
 
 - One service: `api`
 - Build from `./api`
@@ -589,7 +606,7 @@ class: text-2xl
 
 # Boot System #2
 
-The version of our system with only the `app` service is still running. We can either bring the system down and then bring it back up again, or we can just bring up the new service while the system is running.
+The version of our system with only the `api` service is still running. We can either bring the system down and then bring it back up again, or we can just bring up the new service while the system is running.
 
 **Option #1**
 
@@ -681,9 +698,10 @@ api-1  | API SERVICE listening on port 3000
 api-1  | API SERVICE listening on port 3000
 ```
 
-Teaching point:
+**First System Experiment:**
 
 - Compose manages services independently inside one project
+- We can intentionally restart one dependency and observe recovery behavior
 
 ---
 class: text-2xl
@@ -729,9 +747,8 @@ flowchart LR
 
 - We now have two services in one Compose project
 - We see service-name networking in action
+- This is the base pattern we will reuse for state, failure, and scaling tradeoffs
 
----
-class: text-2l
 ---
 
 # In-Class Activity (~15 minutes)
@@ -747,7 +764,7 @@ Your task is to **work collaboratively** to add a new service to our current sys
 
 - Download the code used today from the corresponding Canvas activity.
 - Update the project to include the new service.
-- Screenshot the output rendered in the browser.
+- “Verify service-to-service communication and show docker compose ps + one log screenshot.”
 - If you can't get it to work, screenshot your service code and Dockerfile
 - Submit to Canvas.
 
@@ -759,8 +776,11 @@ class: text-2xl
 
 # Next Time
 
-- We need to expand our understanding of compose
-- Do we really need different port numbers?
-- Add Redis for shared state and failure testing
-- Add a worker service to get the job done
-- Add volumes to persist state
+- When does a "distributed system" start? (Hint: 2 processes)
+- How services find each other in Compose (DNS + networks)
+- Startup order vs readiness (and why the difference matters)
+- The basic boot-stability trio: 
+  - health endpoints
+  - health checks
+  - retries with backoff
+- Build toward Redis/worker patterns without fragile startup behavior

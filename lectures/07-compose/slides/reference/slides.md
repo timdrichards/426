@@ -774,7 +774,7 @@ class: text-2xl
 
 # Reference Links
 
-Official Docker docs used in this module:
+Official Docker docs associated with this module:
 
 - [Docker Compose guide](https://docs.docker.com/guides/docker-compose/)
 - [Compose file reference](https://docs.docker.com/compose/compose-file/)
