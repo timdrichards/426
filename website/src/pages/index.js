@@ -2,100 +2,135 @@ import clsx from 'clsx';
 import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
-import HomepageFeatures from '@site/src/components/HomepageFeatures';
-
 import Heading from '@theme/Heading';
+import assignments from '@site/src/data/assignments';
 import styles from './index.module.css';
 
-function HomepageHeader() {
-  const {siteConfig} = useDocusaurusContext();
-  const repoUrl = siteConfig.customFields?.repoUrl;
+const primaryCards = [
+  {
+    title: 'Syllabus',
+    description: 'Policies, expectations, grading, and course logistics.',
+    to: '/docs/syllabus',
+  },
+  {
+    title: 'Schedule',
+    description: 'Weekly topics, pacing, and major milestones.',
+    to: '/docs/schedule',
+  },
+  {
+    title: 'Lectures',
+    description: 'Lecture index, notes, and links to demos/references.',
+    to: '/docs/lectures',
+  },
+  {
+    title: 'Assignments',
+    description: 'Assignment overview and links to current homework.',
+    to: '/docs/assignments',
+  },
+];
 
+function formatDate(dateString) {
+  if (!dateString) return 'TBD';
+  const date = new Date(`${dateString}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return dateString;
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(date);
+}
+
+function getAssignmentState(item) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const release = item.releaseDate ? new Date(`${item.releaseDate}T00:00:00`) : null;
+  const due = item.dueDate ? new Date(`${item.dueDate}T00:00:00`) : null;
+  if (release && due && release <= today && today <= due) return 'Current';
+  if (release && release > today) return 'Upcoming';
+  if (due && due < today) return 'Closed';
+  return 'Planned';
+}
+
+function sortedAssignments() {
+  return [...assignments].sort((a, b) => {
+    const aDue = a.dueDate ?? '9999-12-31';
+    const bDue = b.dueDate ?? '9999-12-31';
+    return aDue.localeCompare(bDue);
+  });
+}
+
+function CourseCards() {
   return (
-    <header className={clsx(styles.heroBanner)}>
-      <div className={clsx('container', styles.heroShell)}>
-        <div className={styles.heroCard}>
-          <p className={styles.kicker}>Spring-ready course site baseline</p>
-          <Heading as="h1" className={styles.heroTitle}>
-            {siteConfig.title}
-          </Heading>
-          <p className={styles.heroSubtitle}>{siteConfig.tagline}</p>
-          <div className={styles.buttons}>
-            <Link className={clsx('button button--lg', styles.primaryButton)} to="/docs/intro">
-              Open course docs
-            </Link>
-            <Link className={clsx('button button--lg', styles.secondaryButton)} to="/docs/site-workflow">
-              Local + deploy workflow
-            </Link>
-            {repoUrl ? (
-              <Link className={clsx('button button--lg', styles.ghostButton)} href={repoUrl}>
-                Repository
-              </Link>
-            ) : null}
-          </div>
-          <div className={styles.heroMeta}>
-            <div className={styles.metaCard}>
-              <span className={styles.metaLabel}>Content</span>
-              <span className={styles.metaValue}>Docs, demos, lecture support</span>
+    <section className={styles.cardsSection} aria-label="Course navigation">
+      <div className={clsx('container', styles.cardsGrid)}>
+        {primaryCards.map(card => (
+          <Link key={card.title} className={styles.navCard} to={card.to}>
+            <div className={styles.navCardInner}>
+              <p className={styles.navCardLabel}>Open</p>
+              <Heading as="h2" className={styles.navCardTitle}>
+                {card.title}
+              </Heading>
+              <p className={styles.navCardText}>{card.description}</p>
             </div>
-            <div className={styles.metaCard}>
-              <span className={styles.metaLabel}>Deploy</span>
-              <span className={styles.metaValue}>GitHub Actions to Pages</span>
-            </div>
-          </div>
-        </div>
-        <aside className={styles.heroAside} aria-label="Site highlights">
-          <div className={styles.asidePanel}>
-            <Heading as="h2" className={styles.asideTitle}>
-              Calm by default
-            </Heading>
-            <p className={styles.asideText}>
-              A soft color palette, spacious layout, and readable typography for course materials.
-            </p>
-            <ul className={styles.asideList}>
-              <li>Subfolder Docusaurus setup in <code>website/</code></li>
-              <li>GitHub Pages deployment workflow already configured</li>
-              <li>Starter docs ready for your syllabus, labs, and lecture notes</li>
-            </ul>
-          </div>
-        </aside>
+          </Link>
+        ))}
       </div>
-      <div className={styles.heroBackdrop} aria-hidden="true">
-        <div className={styles.orbA} />
-        <div className={styles.orbB} />
-        <div className={styles.orbC} />
-      </div>
-    </header>
+    </section>
   );
 }
 
-function HomeSections() {
+function AssignmentPanel() {
+  const items = sortedAssignments();
+
   return (
-    <section className={styles.sectionWrap}>
-      <div className={clsx('container', styles.sectionGrid)}>
-        <div className={styles.sectionCard}>
-          <Heading as="h2" className={styles.sectionTitle}>
-            Suggested next edits
-          </Heading>
-          <p className={styles.sectionText}>
-            Start by replacing the intro docs page and homepage copy with your actual course schedule and navigation.
-          </p>
-          <ul className={styles.checklist}>
-            <li>Update syllabus links and office hours</li>
-            <li>Add lecture index pages or weekly modules</li>
-            <li>Link assignments, labs, and project rubrics</li>
-          </ul>
-        </div>
-        <div className={styles.sectionCard}>
-          <Heading as="h2" className={styles.sectionTitle}>
-            Local development
-          </Heading>
-          <p className={styles.sectionText}>
-            Edit content in <code>website/docs</code> and preview changes locally with live reload.
-          </p>
-          <pre className={styles.commandBlock}>
-            <code>{`cd website\nnpm install\nnpm start`}</code>
-          </pre>
+    <section className={styles.assignmentsSection} aria-label="Current assignments">
+      <div className={clsx('container', styles.assignmentsLayout)}>
+        <div className={styles.assignmentsPanel}>
+          <div className={styles.sectionHeader}>
+            <p className={styles.sectionEyebrow}>Assignments</p>
+            <Heading as="h2" className={styles.sectionTitle}>
+              Current and upcoming work
+            </Heading>
+            <p className={styles.sectionSubtitle}>
+              This list is generated from assignment files in <code>website/docs/homework/</code>.
+            </p>
+          </div>
+
+          {items.length === 0 ? (
+            <p className={styles.emptyState}>No homework items yet.</p>
+          ) : (
+            <div className={styles.assignmentList}>
+              {items.map(item => (
+                <Link key={item.id} className={styles.assignmentCard} to={item.link}>
+                  <div className={styles.assignmentTopRow}>
+                    <span className={styles.assignmentType}>Homework</span>
+                    <span
+                      className={clsx(
+                        styles.assignmentState,
+                        getAssignmentState(item) === 'Current' && styles.stateCurrent,
+                        getAssignmentState(item) === 'Upcoming' && styles.stateUpcoming,
+                        getAssignmentState(item) === 'Closed' && styles.stateClosed,
+                      )}>
+                      {getAssignmentState(item)}
+                    </span>
+                  </div>
+                  <Heading as="h3" className={styles.assignmentTitle}>
+                    {item.title}
+                  </Heading>
+                  <div className={styles.assignmentDates}>
+                    <div>
+                      <span className={styles.dateLabel}>Released</span>
+                      <span className={styles.dateValue}>{formatDate(item.releaseDate)}</span>
+                    </div>
+                    <div>
+                      <span className={styles.dateLabel}>Due</span>
+                      <span className={styles.dateValue}>{formatDate(item.dueDate)}</span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </section>
@@ -108,10 +143,18 @@ export default function Home() {
     <Layout
       title={siteConfig.title}
       description="Course documentation hub for lectures, demos, and teaching materials">
-      <HomepageHeader />
+      <header className={styles.heroBanner}>
+        <div className={clsx('container', styles.heroContainer)}>
+          <p className={styles.heroKicker}>Course Portal</p>
+          <Heading as="h1" className={styles.heroTitle}>
+            {siteConfig.title}
+          </Heading>
+          <p className={styles.heroSubtitle}>{siteConfig.tagline}</p>
+        </div>
+      </header>
       <main>
-        <HomeSections />
-        <HomepageFeatures />
+        <CourseCards />
+        <AssignmentPanel />
       </main>
     </Layout>
   );

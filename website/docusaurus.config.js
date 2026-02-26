@@ -14,14 +14,12 @@ const organizationName = repoOwnerFromEnv || 'YOUR_GITHUB_USERNAME';
 const projectName = repoNameFromEnv || '426';
 const githubPagesUrl = `https://${organizationName}.github.io`;
 const baseUrl = process.env.DOCUSAURUS_BASE_URL ?? `/${projectName}/`;
-const repoUrl = repository ? `https://github.com/${repository}` : null;
-const editUrl = repoUrl ? `${repoUrl}/tree/main/website/` : undefined;
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: '426 Course Hub',
   tagline: 'Lecture notes, demos, and reference material',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/favicon.svg',
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
@@ -40,9 +38,6 @@ const config = {
   projectName, // Usually your repo name.
 
   onBrokenLinks: 'throw',
-  customFields: {
-    repoUrl,
-  },
 
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
@@ -59,7 +54,6 @@ const config = {
       ({
         docs: {
           sidebarPath: './sidebars.js',
-          editUrl,
         },
         blog: false,
         theme: {
@@ -73,7 +67,7 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       // Replace with your project's social card
-      image: 'img/docusaurus-social-card.jpg',
+      image: 'img/social-card.svg',
       colorMode: {
         respectPrefersColorScheme: true,
       },
@@ -82,7 +76,7 @@ const config = {
         hideOnScroll: true,
         logo: {
           alt: '426 Course Hub Logo',
-          src: 'img/logo.svg',
+          src: 'img/logo-mark.svg',
         },
         items: [
           {
@@ -90,11 +84,6 @@ const config = {
             sidebarId: 'tutorialSidebar',
             position: 'left',
             label: 'Docs',
-          },
-          {
-            href: repoUrl || 'https://github.com',
-            label: 'GitHub',
-            position: 'right',
           },
         ],
       },
@@ -120,10 +109,6 @@ const config = {
               {
                 label: 'Site Workflow',
                 to: '/docs/site-workflow',
-              },
-              {
-                label: 'GitHub Repository',
-                href: repoUrl || 'https://github.com',
               },
             ],
           },

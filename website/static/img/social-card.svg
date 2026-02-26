@@ -1,0 +1,51 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="120" y1="40" x2="1040" y2="590" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FAFCFF"/>
+      <stop offset="1" stop-color="#EEF3F8"/>
+    </linearGradient>
+    <radialGradient id="glowA" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(220 120) rotate(20) scale(360 240)">
+      <stop stop-color="#E4EDF8"/>
+      <stop offset="1" stop-color="#E4EDF8" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowB" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1010 520) rotate(-12) scale(320 210)">
+      <stop stop-color="#DDE9F5"/>
+      <stop offset="1" stop-color="#DDE9F5" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="ring" x1="774" y1="173" x2="1034" y2="455" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#C7D6E8"/>
+      <stop offset="1" stop-color="#90A6BF"/>
+    </linearGradient>
+    <linearGradient id="core" x1="849" y1="256" x2="955" y2="372" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#E3ECF6"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect x="34" y="34" width="1132" height="562" rx="34" fill="white" fill-opacity="0.58" stroke="#DDE6F0" stroke-width="2"/>
+  <ellipse cx="220" cy="120" rx="310" ry="190" fill="url(#glowA)"/>
+  <ellipse cx="1010" cy="520" rx="290" ry="180" fill="url(#glowB)"/>
+
+  <g opacity="0.95">
+    <rect x="96" y="124" width="560" height="382" rx="24" fill="white" fill-opacity="0.72" stroke="#E1E8F1" stroke-width="2"/>
+    <text x="142" y="220" fill="#7B8BA0" font-size="24" font-family="Manrope, Arial, sans-serif" letter-spacing="3.2">COURSE PORTAL</text>
+    <text x="142" y="302" fill="#111827" font-size="68" font-weight="600" font-family="Space Grotesk, Manrope, Arial, sans-serif">426 Course Hub</text>
+    <text x="142" y="356" fill="#58677A" font-size="28" font-family="Manrope, Arial, sans-serif">
+      Syllabus • Schedule • Lectures • Assignments
+    </text>
+    <text x="142" y="430" fill="#6E7D90" font-size="22" font-family="Manrope, Arial, sans-serif">
+      Minimal documentation site for course materials and homework timelines
+    </text>
+  </g>
+
+  <g>
+    <rect x="735" y="145" width="340" height="340" rx="78" fill="#F7FAFE" stroke="#DEE8F2" stroke-width="2"/>
+    <circle cx="905" cy="315" r="98" stroke="url(#ring)" stroke-width="8"/>
+    <path d="M832 358L903 264L978 358" stroke="#6F839B" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M860 358H950" stroke="#A4B5C8" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="905" cy="315" r="39" fill="url(#core)" stroke="#BBC9DA" stroke-width="4"/>
+    <circle cx="980" cy="225" r="10" fill="#93A9C2"/>
+    <circle cx="1002" cy="205" r="5" fill="#C4D2E2"/>
+  </g>
+</svg>

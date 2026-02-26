@@ -1,80 +1,114 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
 
 :root {
-  --ifm-color-primary: #3d727d;
-  --ifm-color-primary-dark: #376771;
-  --ifm-color-primary-darker: #33616a;
-  --ifm-color-primary-darkest: #2a5057;
-  --ifm-color-primary-light: #467f8b;
-  --ifm-color-primary-lighter: #4b8793;
-  --ifm-color-primary-lightest: #5a9aa6;
+  --ifm-color-primary: #566372;
+  --ifm-color-primary-dark: #4e5a67;
+  --ifm-color-primary-darker: #4a5561;
+  --ifm-color-primary-darkest: #3d4650;
+  --ifm-color-primary-light: #617081;
+  --ifm-color-primary-lighter: #6d7c8d;
+  --ifm-color-primary-lightest: #8590a0;
   --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(42, 79, 87, 0.08);
+  --docusaurus-highlighted-code-line-bg: rgba(78, 97, 120, 0.08);
   --ifm-font-family-base: 'Manrope', 'Avenir Next', 'Segoe UI Variable', 'Helvetica Neue', sans-serif;
-  --ifm-heading-font-family: 'Sora', 'Avenir Next', 'Segoe UI Variable', 'Helvetica Neue', sans-serif;
-  --ifm-background-color: #f6f7f3;
-  --ifm-navbar-background-color: rgba(246, 247, 243, 0.78);
-  --ifm-footer-background-color: #24353c;
-  --ifm-heading-color: #20343c;
-  --ifm-font-color-base: #22363f;
-  --ifm-link-color: #2e6170;
-  --site-accent-ink: #456f7b;
-  --site-link: #2d6674;
-  --site-muted-ink: #4f6670;
-  --site-subtle-ink: #70838b;
+  --ifm-heading-font-family: 'Space Grotesk', 'Manrope', 'Avenir Next', 'Segoe UI Variable', 'Helvetica Neue', sans-serif;
+  --ifm-background-color: #f7f9fb;
+  --ifm-background-surface-color: #ffffff;
+  --ifm-navbar-background-color: rgba(247, 249, 251, 0.86);
+  --ifm-footer-background-color: #eef2f6;
+  --ifm-heading-color: #0f172a;
+  --ifm-font-color-base: #3e4a5a;
+  --ifm-link-color: #334155;
+  --ifm-menu-color-active: #0f172a;
+  --site-accent-ink: #738194;
+  --site-link: #334155;
+  --site-muted-ink: #536173;
+  --site-subtle-ink: #7a8799;
 }
 
 [data-theme='dark'] {
-  --ifm-color-primary: #8fc8cd;
-  --ifm-color-primary-dark: #75bcc2;
-  --ifm-color-primary-darker: #69b6bd;
-  --ifm-color-primary-darkest: #45a2ab;
-  --ifm-color-primary-light: #a9d4d8;
-  --ifm-color-primary-lighter: #b6dbde;
-  --ifm-color-primary-lightest: #d2eaec;
-  --docusaurus-highlighted-code-line-bg: rgba(164, 212, 219, 0.13);
-  --ifm-background-color: #18252b;
-  --ifm-background-surface-color: #1d2d34;
-  --ifm-navbar-background-color: rgba(24, 37, 43, 0.82);
-  --ifm-heading-color: #e7f0f1;
-  --ifm-font-color-base: #dbe7e9;
-  --ifm-link-color: #9fd5da;
-  --site-accent-ink: #9fd5da;
-  --site-link: #a8dde2;
-  --site-muted-ink: #bfd0d4;
-  --site-subtle-ink: #9aafb5;
+  --ifm-color-primary: #ced7e2;
+  --ifm-color-primary-dark: #bbc7d5;
+  --ifm-color-primary-darker: #b1becd;
+  --ifm-color-primary-darkest: #92a2b5;
+  --ifm-color-primary-light: #e1e7ef;
+  --ifm-color-primary-lighter: #e8edf3;
+  --ifm-color-primary-lightest: #f5f8fb;
+  --docusaurus-highlighted-code-line-bg: rgba(148, 163, 184, 0.16);
+  --ifm-background-color: #10141b;
+  --ifm-background-surface-color: #161b24;
+  --ifm-navbar-background-color: rgba(16, 20, 27, 0.86);
+  --ifm-footer-background-color: #0e1218;
+  --ifm-heading-color: #f3f6fa;
+  --ifm-font-color-base: #d4dce7;
+  --ifm-link-color: #e8eef7;
+  --ifm-menu-color-active: #ffffff;
+  --site-accent-ink: #9eacbf;
+  --site-link: #e8eef7;
+  --site-muted-ink: #c4cfdd;
+  --site-subtle-ink: #9eacbf;
 }
 
 html,
 body {
-  background:
-    radial-gradient(circle at 8% 2%, rgba(182, 222, 210, 0.16), transparent 40%),
-    radial-gradient(circle at 96% 0%, rgba(156, 207, 219, 0.16), transparent 38%),
-    var(--ifm-background-color);
+  background: var(--ifm-background-color);
 }
 
 [data-theme='dark'] html,
 [data-theme='dark'] body {
-  background:
-    radial-gradient(circle at 10% 0%, rgba(107, 173, 184, 0.12), transparent 36%),
-    radial-gradient(circle at 95% 0%, rgba(137, 186, 160, 0.1), transparent 34%),
-    var(--ifm-background-color);
+  background: var(--ifm-background-color);
 }
 
 .navbar {
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(73, 102, 112, 0.08);
+  border-bottom: 1px solid rgba(17, 24, 39, 0.06);
 }
 
 .footer {
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(17, 24, 39, 0.06);
+}
+
+[data-theme='dark'] .navbar {
+  border-bottom-color: rgba(148, 163, 184, 0.14);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+}
+
+[data-theme='dark'] .footer,
+[data-theme='dark'] .footer--dark {
+  background:
+    radial-gradient(circle at 10% 0%, rgba(79, 101, 131, 0.16), transparent 38%),
+    radial-gradient(circle at 90% 0%, rgba(66, 92, 122, 0.12), transparent 34%),
+    #0f141c;
+  border-top-color: rgba(148, 163, 184, 0.12);
+}
+
+[data-theme='dark'] .footer__title {
+  color: #eef4fc;
+}
+
+[data-theme='dark'] .footer__link-item {
+  color: #bfccdc;
+}
+
+[data-theme='dark'] .footer__link-item:hover {
+  color: #eef4fc;
+}
+
+[data-theme='dark'] .navbar__link,
+[data-theme='dark'] .menu__link {
+  color: #c4d1e1;
+}
+
+[data-theme='dark'] .navbar__link:hover,
+[data-theme='dark'] .menu__link:hover {
+  color: #eef4fc;
 }
 
 .markdown h1,
 .markdown h2,
 .markdown h3,
 .markdown h4 {
-  letter-spacing: -0.015em;
+  letter-spacing: -0.02em;
   font-weight: 600;
 }
 
@@ -88,4 +122,19 @@ body {
 .footer__title {
   font-family: var(--ifm-heading-font-family);
   font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.theme-doc-sidebar-container {
+  border-right: 1px solid rgba(17, 24, 39, 0.06);
+}
+
+[data-theme='dark'] .theme-doc-sidebar-container {
+  border-right-color: rgba(148, 163, 184, 0.12);
+  background: rgba(18, 22, 30, 0.52);
+}
+
+[data-theme='dark'] .theme-doc-toc-desktop,
+[data-theme='dark'] .theme-doc-toc-mobile {
+  border-left-color: rgba(148, 163, 184, 0.12);
 }

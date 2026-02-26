@@ -12,6 +12,13 @@ This site is the documentation layer for the `426` repository. It is designed to
 - setup walkthroughs for tools used in class
 - links into code/demo material stored elsewhere in the repo
 
+## Start here
+
+- [Syllabus](./syllabus)
+- [Schedule](./schedule)
+- [Lectures](./lectures)
+- [Assignments](./assignments)
+
 ## Repository layout (current baseline)
 
 - `lectures/`: lecture content, demos, and related course assets
@@ -39,9 +46,4 @@ This repository is configured to deploy the Docusaurus build to GitHub Pages usi
 
 ## Next recommended content
 
-Replace this baseline with your course-specific content:
-
-1. Syllabus / policies
-2. Lecture schedule and links
-3. Assignment and project pages
-4. Setup guides for tooling used in class
+Replace the placeholders in `Syllabus`, `Schedule`, `Lectures`, and `Assignments` with your actual course content.
