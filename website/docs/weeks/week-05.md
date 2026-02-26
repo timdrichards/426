@@ -1,6 +1,7 @@
 ---
 title: "Week 05"
 sidebar_position: 5
+draft: true
 ---
 
 # Week 05
