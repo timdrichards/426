@@ -54,6 +54,8 @@ const config = {
       ({
         docs: {
           sidebarPath: './sidebars.js',
+          // Keep underscore-prefixed docs in the repo without publishing them.
+          exclude: ['**/_*.md', '**/_*.mdx'],
         },
         blog: false,
         theme: {
