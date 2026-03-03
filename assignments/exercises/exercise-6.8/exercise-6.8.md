@@ -1,15 +1,19 @@
 ---
 id: exercise-6.8
-title: "Exercise 6.8"
+title: 'Exercise 6.8'
 sidebar_position: 1
 slug: /assignments/exercises/exercise-6.8
-releaseDate: "2026-03-03"
-dueDate: "2026-03-10"
+releaseDate: '2026-03-03'
+dueDate: '2026-03-10'
 ---
 
 # Exercise 6.8 — Resilience Probe: Web + API + Redis
 
-Exercises are guided practice for the lecture material. They are non-graded, but later graded assignments and tests assume this work has been completed.
+Exercises are guided practice for the lecture material. They are non-graded, but later graded assignments assume this work has been completed.
+
+## System Diagram
+
+![Web API Redis system diagram](./images/system-overview.png)
 
 ## Starter Code Download
 

@@ -14,6 +14,10 @@ assignments/
     .gitkeep
     exercise-6.8/
       exercise-6.8.md
+      excalidraw/
+        # .excalidraw source diagrams
+      images/
+        # generated image assets for markdown references
       exercise-6.8/
         # exercise code
   homework/
@@ -48,9 +52,11 @@ npm run sync:assignments:drafts
 The sync script will:
 
 1. Copy markdown into `website/docs/assignments/<type>/`.
-2. Zip code into `website/static/code/<assignment-name>.zip` when a matching code folder exists.
-3. Publish no zip when code folder is absent.
-4. Remove stale published markdown/zip files when source assignments are removed or moved to draft.
+2. Copy each assignment folder into `website/docs/assignments/<type>/<assignment-name>/` (including markdown/images and other doc assets, but excluding raw code folders and `excalidraw/` sources).
+3. Export `excalidraw/*.excalidraw` diagrams to `images/*.png` before syncing.
+4. Zip code into `website/static/code/<assignment-name>.zip` when a matching code folder exists.
+5. Publish no zip when code folder is absent.
+6. Remove stale published markdown/zip files when source assignments are removed or moved to draft.
 
 Supported assignment types:
 
