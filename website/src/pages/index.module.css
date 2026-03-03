@@ -134,20 +134,71 @@
   gap: 0.75rem;
 }
 
+.assignmentCategoryList {
+  display: grid;
+  gap: 1rem;
+}
+
+.categorySection {
+  border: 1px solid rgba(63, 78, 96, 0.08);
+  border-radius: 0.95rem;
+  background: linear-gradient(180deg, #ffffff, #f8fafd);
+  padding: 0.9rem;
+}
+
+.categoryHeader {
+  margin-bottom: 0.75rem;
+}
+
+.categoryTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+
+.categoryTitle {
+  margin: 0;
+  color: #111827;
+  font-size: 1.05rem;
+}
+
+.weightBadge {
+  border-radius: 999px;
+  padding: 0.12rem 0.55rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #3f526c;
+  background: #eef3fa;
+  border: 1px solid #d7e2ef;
+}
+
+.categoryBlurb {
+  margin: 0.45rem 0 0;
+  color: #56667c;
+}
+
+.categoryMeta {
+  margin: 0.35rem 0 0;
+  color: #506077;
+  font-size: 0.92rem;
+}
+
 .assignmentCard {
   display: block;
   text-decoration: none;
   color: inherit;
   border-radius: 0.9rem;
-  border: 1px solid rgba(63, 78, 96, 0.08);
-  background: linear-gradient(180deg, #ffffff, #f7f9fc);
+  border: 1px solid #cfe0f5;
+  background: linear-gradient(180deg, #ffffff, #edf5ff);
   padding: 0.9rem;
-  transition: border-color 160ms ease, box-shadow 160ms ease;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
 }
 
 .assignmentCard:hover {
-  border-color: rgba(63, 78, 96, 0.13);
-  box-shadow: 0 10px 18px rgba(30, 41, 59, 0.05);
+  transform: translateY(-1px);
+  border-color: #b5cce8;
+  box-shadow: 0 10px 18px rgba(44, 88, 138, 0.12);
 }
 
 .assignmentTopRow {
@@ -324,13 +375,33 @@
 }
 
 [data-theme='dark'] .assignmentCard {
+  border-color: rgba(124, 156, 191, 0.35);
+  background: linear-gradient(180deg, rgba(29, 39, 56, 0.95), rgba(23, 31, 45, 0.95));
+}
+
+[data-theme='dark'] .categorySection {
   border-color: rgba(157, 176, 200, 0.13);
   background: linear-gradient(180deg, rgba(27, 34, 46, 0.95), rgba(21, 26, 36, 0.95));
 }
 
+[data-theme='dark'] .categoryTitle {
+  color: #eef4fc;
+}
+
+[data-theme='dark'] .weightBadge {
+  color: #d6e3f3;
+  background: rgba(48, 65, 88, 0.5);
+  border-color: rgba(157, 176, 200, 0.22);
+}
+
+[data-theme='dark'] .categoryBlurb,
+[data-theme='dark'] .categoryMeta {
+  color: #c0cedf;
+}
+
 [data-theme='dark'] .assignmentCard:hover {
-  border-color: rgba(183, 199, 220, 0.22);
-  box-shadow: 0 12px 20px rgba(1, 5, 12, 0.33);
+  border-color: rgba(156, 188, 224, 0.5);
+  box-shadow: 0 12px 20px rgba(14, 34, 59, 0.4);
 }
 
 [data-theme='dark'] .assignmentType,

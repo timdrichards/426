@@ -1,15 +1,15 @@
 ---
-id: homework-01
-title: "Homework 1: Environment Check and Course Setup"
+id: exercise-01
+title: "Exercise 1: Environment Check and Course Setup"
 sidebar_position: 1
-slug: /assignments/homework-01
+slug: /assignments/exercises/exercise-01
 releaseDate: "2026-02-26"
 dueDate: "2026-03-05"
 ---
 
-# Homework 1: Environment Check and Course Setup
+# Exercise 1: Environment Check and Course Setup
 
-This is a placeholder assignment to demonstrate the homework folder structure and homepage assignment summary.
+This is a starter exercise to verify your local setup and submission workflow.
 
 ## Objectives
 

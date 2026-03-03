@@ -4,16 +4,18 @@ sidebar_position: 5
 
 # Assignments
 
-Use this page as the assignment index and policy overview.
+All coursework is organized by category in `website/docs/assignments/`.
 
-## Assignment list
+## Categories and Weights
 
-Current homework pages:
+- Exercises: 25%
+- In-Class Activities: 15%
+- Exams: 30%
 
-- [Homework 1 placeholder](./assignments/homework-01)
+## Release and Submission
 
-## Student notes (replace this)
+- Exercises are typically released after lecture and submitted on Canvas unless the prompt requires a repository link.
+- In-class activities are released during class and are usually due before class ends.
+- Exams are announced ahead of time with a defined availability window and submission method.
 
-Use this section for submission policies, late policy reminders, and links to course-specific assignment guidance.
-
-Authoring/maintenance instructions for instructors are kept in the repository root `ASSIGNMENTS.md` (not published on the website).
+See the homepage for a category-by-category view with current due dates.

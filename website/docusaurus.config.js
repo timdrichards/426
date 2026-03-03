@@ -105,15 +105,6 @@ const config = {
               },
             ],
           },
-          {
-            title: 'Workflow',
-            items: [
-              {
-                label: 'Site Workflow',
-                to: '/docs/site-workflow',
-              },
-            ],
-          },
         ],
         copyright: `Copyright © ${new Date().getFullYear()} Tim Richards. Built with Docusaurus.`,
       },

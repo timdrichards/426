@@ -15,14 +15,14 @@ const FeatureList = [
     cta: 'See the content map',
   },
   {
-    title: 'Low-Friction Publishing',
+    title: 'Plan the Week',
     description: (
       <>
-        Changes pushed to <code>main</code> can publish automatically through the configured GitHub Pages workflow.
+        Keep the class cadence clear with a single place for milestones, lecture pacing, and due dates.
       </>
     ),
-    href: '/docs/site-workflow',
-    cta: 'Deployment workflow',
+    href: '/docs/schedule',
+    cta: 'View schedule',
   },
   {
     title: 'Docs First, Code Nearby',
