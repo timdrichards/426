@@ -29,6 +29,9 @@ const primaryCards = [
   },
 ];
 
+const FIVE_DAYS = 5;
+const MS_PER_DAY = 1000 * 60 * 60 * 24;
+
 function formatDate(dateString) {
   if (!dateString) return 'TBD';
   const date = new Date(`${dateString}T00:00:00`);
@@ -38,6 +41,15 @@ function formatDate(dateString) {
     day: 'numeric',
     year: 'numeric',
   }).format(date);
+}
+
+function daysUntilDate(dateString) {
+  if (!dateString) return null;
+  const due = new Date(`${dateString}T00:00:00`);
+  if (Number.isNaN(due.getTime())) return null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return Math.floor((due.getTime() - today.getTime()) / MS_PER_DAY);
 }
 
 function getAssignmentState(item) {
@@ -51,11 +63,48 @@ function getAssignmentState(item) {
   return 'Planned';
 }
 
+function getDuePriority(item) {
+  const daysUntilDue = daysUntilDate(item.dueDate);
+  if (daysUntilDue === null) return 3;
+  if (daysUntilDue < 0) return 2;
+  if (daysUntilDue <= FIVE_DAYS) return 0;
+  return 1;
+}
+
+function getDueCardStyle(item) {
+  const daysUntilDue = daysUntilDate(item.dueDate);
+  if (daysUntilDue === null) return undefined;
+
+  if (daysUntilDue < 0) {
+    return {
+      '--assignment-bg': 'linear-gradient(180deg, #fff8f8, #ffe3e3)',
+      '--assignment-border': '#f2b0b0',
+      '--assignment-shadow': 'rgba(168, 54, 54, 0.14)',
+    };
+  }
+
+  if (daysUntilDue > FIVE_DAYS) return undefined;
+
+  const ratio = (FIVE_DAYS - daysUntilDue) / FIVE_DAYS;
+  const hue = Math.round(120 * (1 - ratio));
+  return {
+    '--assignment-bg': `linear-gradient(180deg, #ffffff, hsl(${hue} 85% 92%))`,
+    '--assignment-border': `hsl(${hue} 55% 74%)`,
+    '--assignment-shadow': `hsla(${hue} 65% 35% / 0.16)`,
+  };
+}
+
 function sortByDueDate(items) {
   return [...items].sort((a, b) => {
+    const priorityDiff = getDuePriority(a) - getDuePriority(b);
+    if (priorityDiff !== 0) return priorityDiff;
+
     const aDue = a.dueDate ?? '9999-12-31';
     const bDue = b.dueDate ?? '9999-12-31';
-    return aDue.localeCompare(bDue);
+    const dueDiff = aDue.localeCompare(bDue);
+    if (dueDiff !== 0) return dueDiff;
+
+    return a.title.localeCompare(b.title);
   });
 }
 
@@ -110,15 +159,19 @@ function AssignmentPanel() {
           </div>
 
           <div className={styles.assignmentCategoryList}>
-            {categories.map(category => (
-              <section key={category.key} className={styles.categorySection}>
-                <div className={styles.categoryHeader}>
+            {categories.map((category, index) => (
+              <details key={category.key} className={styles.categorySection} open={index === 0}>
+                <summary className={styles.categorySummary}>
                   <div className={styles.categoryTitleRow}>
                     <Heading as="h3" className={styles.categoryTitle}>
                       {category.label}
                     </Heading>
                     <span className={styles.weightBadge}>Weight: {category.weight}</span>
+                    <span className={styles.categoryCount}>{category.items.length} items</span>
                   </div>
+                </summary>
+
+                <div className={styles.categoryHeader}>
                   <p className={styles.categoryBlurb}>{category.blurb}</p>
                   <p className={styles.categoryMeta}>
                     <strong>Release:</strong> {category.releasePolicy}
@@ -135,7 +188,11 @@ function AssignmentPanel() {
                     {category.items.map(item => {
                       const state = getAssignmentState(item);
                       return (
-                        <Link key={item.id} className={styles.assignmentCard} to={item.link}>
+                        <Link
+                          key={item.id}
+                          className={styles.assignmentCard}
+                          to={item.link}
+                          style={getDueCardStyle(item)}>
                           <div className={styles.assignmentTopRow}>
                             <span className={styles.assignmentType}>{item.kind}</span>
                             <span
@@ -166,7 +223,7 @@ function AssignmentPanel() {
                     })}
                   </div>
                 )}
-              </section>
+              </details>
             ))}
           </div>
         </div>

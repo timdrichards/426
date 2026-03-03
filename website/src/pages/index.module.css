@@ -146,6 +146,15 @@
   padding: 0.9rem;
 }
 
+.categorySummary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.categorySummary::-webkit-details-marker {
+  display: none;
+}
+
 .categoryHeader {
   margin-bottom: 0.75rem;
 }
@@ -173,6 +182,16 @@
   border: 1px solid #d7e2ef;
 }
 
+.categoryCount {
+  border-radius: 999px;
+  padding: 0.12rem 0.55rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #4a5f79;
+  background: #f2f6fb;
+  border: 1px solid #d8e4f2;
+}
+
 .categoryBlurb {
   margin: 0.45rem 0 0;
   color: #56667c;
@@ -189,16 +208,16 @@
   text-decoration: none;
   color: inherit;
   border-radius: 0.9rem;
-  border: 1px solid #cfe0f5;
-  background: linear-gradient(180deg, #ffffff, #edf5ff);
+  border: 1px solid var(--assignment-border, #cfe0f5);
+  background: var(--assignment-bg, linear-gradient(180deg, #ffffff, #edf5ff));
   padding: 0.9rem;
   transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
 }
 
 .assignmentCard:hover {
   transform: translateY(-1px);
-  border-color: #b5cce8;
-  box-shadow: 0 10px 18px rgba(44, 88, 138, 0.12);
+  border-color: var(--assignment-border, #b5cce8);
+  box-shadow: 0 10px 18px var(--assignment-shadow, rgba(44, 88, 138, 0.12));
 }
 
 .assignmentTopRow {
@@ -389,6 +408,12 @@
 }
 
 [data-theme='dark'] .weightBadge {
+  color: #d6e3f3;
+  background: rgba(48, 65, 88, 0.5);
+  border-color: rgba(157, 176, 200, 0.22);
+}
+
+[data-theme='dark'] .categoryCount {
   color: #d6e3f3;
   background: rgba(48, 65, 88, 0.5);
   border-color: rgba(157, 176, 200, 0.22);

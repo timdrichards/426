@@ -1,0 +1,352 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Count 3 /Kids [ 4 0 R 6 0 R 8 0 R ] >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 2014 >>
+stream
+BT
+/F1 10 Tf
+14 TL
+54 738 Td
+(Resilience Lab Command and Tool Reference) Tj
+T*
+() Tj
+T*
+(This page covers every Docker Compose command and probe tool used in Lecture 08 resilience work) Tj
+T*
+(\(web + api + redis\).) Tj
+T*
+() Tj
+T*
+(Docker Compose Commands) Tj
+T*
+() Tj
+T*
+(docker compose up --build) Tj
+T*
+(- What it is for: Build images and start services in foreground mode.) Tj
+T*
+(- Why use it: Reproduces startup timing and failure windows while logs stream directly.) Tj
+T*
+(- Example:) Tj
+T*
+(    docker compose up --build) Tj
+T*
+() Tj
+T*
+(docker compose up -d --build) Tj
+T*
+(- What it is for: Build and start services in detached mode.) Tj
+T*
+(- Why use it: Fast way to boot the full stack and keep terminal free for probes/logs.) Tj
+T*
+(- Example:) Tj
+T*
+(    docker compose up -d --build) Tj
+T*
+() Tj
+T*
+(docker compose up -d redis) Tj
+T*
+(- What it is for: Start only Redis service.) Tj
+T*
+(- Why use it: Isolate dependency startup behavior before starting api/web.) Tj
+T*
+(- Example:) Tj
+T*
+(    docker compose up -d redis) Tj
+T*
+() Tj
+T*
+(docker compose up -d) Tj
+T*
+(- What it is for: Start services using existing images.) Tj
+T*
+(- Why use it: Quick restart when code/images are already built.) Tj
+T*
+(- Example:) Tj
+T*
+(    docker compose up -d) Tj
+T*
+() Tj
+T*
+(docker compose ps) Tj
+T*
+(- What it is for: Show container status and health state.) Tj
+T*
+(- Why use it: First checkpoint to see starting, healthy, or unhealthy before deep debugging.) Tj
+T*
+(- Example:) Tj
+T*
+(    docker compose ps) Tj
+T*
+() Tj
+T*
+(docker compose logs -f web api redis) Tj
+T*
+(- What it is for: Follow live logs for all core services.) Tj
+T*
+(- Why use it: Correlate probe failures with exact restart/connect timing.) Tj
+T*
+(- Example:) Tj
+T*
+(    docker compose logs -f web api redis) Tj
+T*
+() Tj
+T*
+(docker compose logs -f api) Tj
+T*
+(- What it is for: Follow one service?s logs.) Tj
+T*
+(- Why use it: Narrow focus when api readiness is suspicious.) Tj
+T*
+(- Example:) Tj
+T*
+(    docker compose logs -f api) Tj
+ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 7 0 R >>
+endobj
+7 0 obj
+<< /Length 2187 >>
+stream
+BT
+/F1 10 Tf
+14 TL
+54 738 Td
+() Tj
+T*
+(docker compose restart redis) Tj
+T*
+(- What it is for: Intentionally restart dependency.) Tj
+T*
+(- Why use it: Failure injection for resilience testing.) Tj
+T*
+(- Example:) Tj
+T*
+(    docker compose restart redis) Tj
+T*
+() Tj
+T*
+(docker compose exec redis redis-cli) Tj
+T*
+(- What it is for: Open Redis CLI inside running container.) Tj
+T*
+(- Why use it: Validate Redis directly \(PING, GET, INCR\) without network assumptions.) Tj
+T*
+(- Example:) Tj
+T*
+(    docker compose exec redis redis-cli) Tj
+T*
+() Tj
+T*
+(docker compose exec <service> sh) Tj
+T*
+(- What it is for: Open shell inside a service container.) Tj
+T*
+(- Why use it: Run local checks from container network perspective.) Tj
+T*
+(- Example:) Tj
+T*
+(    docker compose exec api sh) Tj
+T*
+() Tj
+T*
+(docker compose exec api wget -qO- http://localhost:3000/readyz) Tj
+T*
+(- What it is for: Probe API readiness from inside the API container.) Tj
+T*
+(- Why use it: Matches Compose health check behavior exactly.) Tj
+T*
+(- Example:) Tj
+T*
+(    docker compose exec api wget -qO- http://localhost:3000/readyz) Tj
+T*
+() Tj
+T*
+(docker compose up -d --build web) Tj
+T*
+(- What it is for: Rebuild/restart only web service.) Tj
+T*
+(- Why use it: Iterate on retry/backoff tuning quickly.) Tj
+T*
+(- Example:) Tj
+T*
+(    docker compose up -d --build web) Tj
+T*
+() Tj
+T*
+(Supporting Container Command) Tj
+T*
+() Tj
+T*
+(docker run --rm -it --network <project>_default redis:7-alpine redis-cli -h redis) Tj
+T*
+(- What it is for: Launch temporary Redis CLI container on Compose network.) Tj
+T*
+(- Why use it: Useful when you do not want to exec into existing Redis container.) Tj
+T*
+(- Example:) Tj
+T*
+(    docker run --rm -it --network resilience-08_default redis:7-alpine redis-cli -h redis) Tj
+T*
+() Tj
+T*
+(Probe Tools) Tj
+T*
+() Tj
+T*
+(curl) Tj
+T*
+(- What it is: CLI HTTP client for quick endpoint checks.) Tj
+T*
+(- What it is for: Verify health/readiness and capture status + body quickly.) Tj
+T*
+(- Why use it: Available almost everywhere; ideal for repeated probes during failures.) Tj
+T*
+(- Examples:) Tj
+T*
+(    curl http://localhost:3000/healthz) Tj
+T*
+(    curl http://localhost:3000/readyz) Tj
+ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 9 0 R >>
+endobj
+9 0 obj
+<< /Length 1855 >>
+stream
+BT
+/F1 10 Tf
+14 TL
+54 738 Td
+(    curl http://localhost:3001) Tj
+T*
+(    curl -i http://localhost:3000/readyz   # include HTTP status headers) Tj
+T*
+() Tj
+T*
+(wget) Tj
+T*
+(- What it is: CLI downloader that can also perform HTTP probes.) Tj
+T*
+(- What it is for: Lightweight machine probes in containers and health checks.) Tj
+T*
+(- Why use it: Common in minimal images; simple non-interactive readiness test.) Tj
+T*
+(- Examples:) Tj
+T*
+(    wget -qO- http://localhost:3000/readyz) Tj
+T*
+(    wget -qO- http://api:3000/readyz) Tj
+T*
+() Tj
+T*
+(Redis CLI Commands Used in Lab) Tj
+T*
+() Tj
+T*
+(PING) Tj
+T*
+(- What it is for: Basic liveness check to Redis.) Tj
+T*
+(- Why use it: Fastest signal that Redis is reachable.) Tj
+T*
+() Tj
+T*
+(SET <key> <value> / GET <key>) Tj
+T*
+(- What it is for: Store and retrieve known values.) Tj
+T*
+(- Why use it: Confirms reads/writes work, not just socket connectivity.) Tj
+T*
+() Tj
+T*
+(INCR <key>) Tj
+T*
+(- What it is for: Increment counter atomically.) Tj
+T*
+(- Why use it: Matches this lab?s visits pattern used by api.) Tj
+T*
+() Tj
+T*
+(KEYS *) Tj
+T*
+(- What it is for: List keys \(small/dev datasets only\).) Tj
+T*
+(- Why use it: Quick visibility while learning/debugging.) Tj
+T*
+() Tj
+T*
+(Examples:) Tj
+T*
+(    PING) Tj
+T*
+(    SET course cs426) Tj
+T*
+(    GET course) Tj
+T*
+(    INCR visits) Tj
+T*
+(    GET visits) Tj
+T*
+(    KEYS *) Tj
+T*
+() Tj
+T*
+(Recommended Command Sequence During Incidents) Tj
+T*
+() Tj
+T*
+(    docker compose ps) Tj
+T*
+(    docker compose logs -f web api redis) Tj
+T*
+(    curl -i http://localhost:3000/healthz) Tj
+T*
+(    curl -i http://localhost:3000/readyz) Tj
+T*
+(    curl -i http://localhost:3001) Tj
+T*
+(    docker compose exec api sh) Tj
+T*
+() Tj
+T*
+(This order prevents random debugging and gives fast triage: container state -> logs -> probes) Tj
+T*
+(-> in-container verification.) Tj
+ET
+endstream
+endobj
+xref
+0 10
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000135 00000 n 
+0000000205 00000 n 
+0000000331 00000 n 
+0000002397 00000 n 
+0000002523 00000 n 
+0000004762 00000 n 
+0000004888 00000 n 
+trailer
+<< /Size 10 /Root 1 0 R >>
+startxref
+6795
+%%EOF

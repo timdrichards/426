@@ -1,0 +1,88 @@
+{
+  "course": "CS 426",
+  "exercise_id": "8.1",
+  "title": "Resilience Probe Lab: Web + API + Redis",
+  "minutes": 50,
+  "why_it_matters": "Lecture 08 introduces the core reliability distinction between process startup and service readiness. In real systems, dependencies restart and transient failures happen. This exercise practices designing `/healthz` and `/readyz`, observing Compose health states, and injecting failures so students can prove the system degrades gracefully and recovers without manual intervention.",
+  "practice_points": [
+    "use health and readiness endpoints for machine-readable service state",
+    "interpret Docker Compose health transitions during boot and failures",
+    "simulate dependency disruption and validate retry/backoff behavior",
+    "collect evidence from logs and probes to locate the failing service"
+  ],
+  "repo_url": "/Users/richards/Git/426",
+  "branch": "main",
+  "references": [
+    "Lecture source: lectures/08-resilience/slides/slides.md",
+    "Code base: lectures/08-resilience/code",
+    "Compose file: lectures/08-resilience/code/compose.yml"
+  ],
+  "starting_instructions": [
+    "Open `lectures/08-resilience/code` in your terminal.",
+    "Run `docker compose up -d --build` to build and start `web`, `api`, and `redis`.",
+    "Run `docker compose ps` and confirm all services are up before starting probes.",
+    "Keep a second terminal ready for logs with `docker compose logs -f web api redis`."
+  ],
+  "parts": [
+    {
+      "label": "Part A",
+      "time": "10-15 min",
+      "title": "Baseline Health and Readiness",
+      "tasks": [
+        "Probe `api` with `curl http://localhost:3000/healthz` and `curl http://localhost:3000/readyz`.",
+        "Probe `web` with `curl http://localhost:3001` and record the response when the stack is healthy.",
+        "Capture one `docker compose ps` snapshot and identify health states (`starting`, `healthy`, or `unhealthy`)."
+      ]
+    },
+    {
+      "label": "Part B",
+      "time": "15-20 min",
+      "title": "Inject and Observe Failure",
+      "tasks": [
+        "Inject disruption using `docker compose restart redis`.",
+        "While Redis restarts, repeatedly run `curl http://localhost:3001` and `curl http://localhost:3000/readyz`.",
+        "Follow logs with `docker compose logs -f web api redis` and note exactly when symptoms begin and recovery occurs.",
+        "Describe whether failures are brief degradation (`503`) or persistent crash behavior."
+      ]
+    },
+    {
+      "label": "Part C",
+      "time": "15-20 min",
+      "title": "Tune Recovery Behavior",
+      "tasks": [
+        "In `web/server.js`, change retry parameters in `withRetry` usage to `attempts = 6` and `baseMs = 200`.",
+        "Rebuild only web using `docker compose up -d --build web`.",
+        "Repeat the Redis restart experiment and compare user-visible failures before vs after tuning.",
+        "Write a short evidence-based conclusion about whether increased retry/backoff improved resilience."
+      ]
+    }
+  ],
+  "ai_assist_ideas": [
+    "Explain the withRetry function and predict total worst-case wait time for 6 attempts with 200ms base delay.",
+    "Given the readyz handler in the API service, what false-positive readiness risks still exist?",
+    "I observed intermittent 503 responses after restarting Redis with Docker Compose. Suggest a debugging checklist focused on logs and probe sequencing."
+  ],
+  "prompt_log_requirement": "AI assistance is allowed, but you must log every prompt/response in `prompt-log.md` with tool name, exact prompt, and a short note describing how you used the result.",
+  "target_behavior": [
+    "`/healthz` remains 200 while service processes are alive",
+    "`/readyz` reflects dependency state and can return 503 during Redis outages",
+    "`web` may briefly degrade during Redis disruption but should recover without manual restarts",
+    "students can identify the offending dependency from probe outputs plus logs"
+  ],
+  "saving_work": [
+    "Stage only files changed for this exercise.",
+    "Commit with a message such as `exercise 8.1: resilience probes and failure analysis`.",
+    "Keep notes and timeline evidence in `exercise-notes.md` or equivalent."
+  ],
+  "verifying_work": [
+    "Run `docker compose ps` and confirm healthy state after experiments complete.",
+    "Re-run curl checks for `http://localhost:3000/healthz`, `http://localhost:3000/readyz`, and `http://localhost:3001`.",
+    "Demonstrate that the stack recovers after `docker compose restart redis`.",
+    "Ensure your before/after comparison of retry settings is based on observed outputs, not assumptions."
+  ],
+  "solution_walkthrough": [
+    "Compare your probe order against the lecture's observability sequence: `compose ps` -> `logs` -> endpoint probes -> in-container checks.",
+    "Review `lectures/08-resilience/code/web/server.js` and `lectures/08-resilience/code/api/server.js` to explain why behavior changed.",
+    "Use your timeline to justify which service was the initial source of failure and why."
+  ]
+}

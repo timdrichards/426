@@ -1,0 +1,28 @@
+{
+  "defaults": {
+    "kind": "Assignment",
+    "blurb": "Course work grouped by assignment type.",
+    "releasePolicy": "Release timing is listed in the assignment prompt.",
+    "submissionPolicy": "Submission instructions are listed in the assignment prompt."
+  },
+  "categories": {
+    "exercises": {
+      "kind": "Exercise",
+      "blurb": "Short applied work to practice weekly concepts with quick feedback.",
+      "releasePolicy": "Usually posted after lecture.",
+      "submissionPolicy": "Submit on Canvas unless the prompt requires a repo link."
+    },
+    "in-class-activities": {
+      "kind": "In-Class Activity",
+      "blurb": "In-class tasks that reinforce the day’s material.",
+      "releasePolicy": "Released at the start of class or activity block.",
+      "submissionPolicy": "Submit before class ends unless otherwise noted."
+    },
+    "homework": {
+      "kind": "Homework",
+      "blurb": "Longer take-home assignments that synthesize multiple topics.",
+      "releasePolicy": "Released on the course site and announced in class.",
+      "submissionPolicy": "Submit through the LMS by the listed due date."
+    }
+  }
+}

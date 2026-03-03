@@ -1,0 +1,322 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Count 3 /Kids [ 4 0 R 6 0 R 8 0 R ] >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 2139 >>
+stream
+BT
+/F1 10 Tf
+14 TL
+54 738 Td
+(Forensic Probing Playbook: Finding the Offending Service) Tj
+T*
+() Tj
+T*
+(Think like an incident investigator. Your job is not to guess. Your job is to build evidence,) Tj
+T*
+(narrow suspects, and identify the service that caused failure first.) Tj
+T*
+() Tj
+T*
+(Investigation Principles) Tj
+T*
+() Tj
+T*
+(- Start with timeline, not assumptions.) Tj
+T*
+(- Separate symptom service from root-cause service.) Tj
+T*
+(- Verify each claim with at least one command output.) Tj
+T*
+(- Use repeatable probe order so different people reach same conclusion.) Tj
+T*
+(- Track both process state \(running\) and readiness state \(able to serve traffic\).) Tj
+T*
+() Tj
+T*
+(Service Map \(Suspect Graph\)) Tj
+T*
+() Tj
+T*
+(- User hits web on localhost:3001.) Tj
+T*
+(- web depends on api \(http://api:3000\).) Tj
+T*
+(- api depends on redis \(redis://redis:6379\).) Tj
+T*
+() Tj
+T*
+(If web fails, culprit may still be api or redis.) Tj
+T*
+() Tj
+T*
+(Failure Signatures in This System) Tj
+T*
+() Tj
+T*
+(- api /healthz = 200, api /readyz = 503: API process alive, dependency not ready \(often Redis\).) Tj
+T*
+(- web / = 503 dependency unavailable: web cannot get a good upstream response after retries.) Tj
+T*
+(- Redis restarted and shortly after API readiness drops: likely dependency outage, not API code) Tj
+T*
+(bug.) Tj
+T*
+(- Container unhealthy in docker compose ps: probe command is failing repeatedly.) Tj
+T*
+() Tj
+T*
+(Step-by-Step Investigation Workflow) Tj
+T*
+() Tj
+T*
+(Step 1: Establish Scene Status) Tj
+T*
+(    docker compose ps) Tj
+T*
+(What to check:) Tj
+T*
+(- Are all three containers up?) Tj
+T*
+(- Which container is starting / healthy / unhealthy?) Tj
+T*
+() Tj
+T*
+(Step 2: Build a Shared Timeline) Tj
+T*
+(    docker compose logs -f web api redis) Tj
+T*
+(What to check:) Tj
+T*
+(- First error timestamp.) Tj
+T*
+(- Which service logged problems first.) Tj
+T*
+(- Did downstream services fail after upstream dependency events?) Tj
+T*
+() Tj
+T*
+(Step 3: Probe Health vs Readiness) Tj
+T*
+(    curl -i http://localhost:3000/healthz) Tj
+T*
+(    curl -i http://localhost:3000/readyz) Tj
+T*
+(    curl -i http://localhost:3001) Tj
+ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 7 0 R >>
+endobj
+7 0 obj
+<< /Length 2048 >>
+stream
+BT
+/F1 10 Tf
+14 TL
+54 738 Td
+(Interpretation:) Tj
+T*
+(- healthz=200 + readyz=503 means API process is alive but not ready for traffic.) Tj
+T*
+(- web=503 with API readiness failures usually means upstream dependency chain issue.) Tj
+T*
+() Tj
+T*
+(Step 4: Inspect Dependency Directly) Tj
+T*
+(    docker compose exec redis redis-cli) Tj
+T*
+(    PING) Tj
+T*
+(    INCR visits) Tj
+T*
+(    GET visits) Tj
+T*
+(What to check:) Tj
+T*
+(- Does Redis respond immediately?) Tj
+T*
+(- Are read/write commands successful?) Tj
+T*
+() Tj
+T*
+(Step 5: Validate In-Container Network Path) Tj
+T*
+(    docker compose exec api wget -qO- http://localhost:3000/readyz) Tj
+T*
+(    docker compose exec api sh) Tj
+T*
+(What to check:) Tj
+T*
+(- Does API report readiness from inside its own container?) Tj
+T*
+(- If needed, run more checks from inside container network context.) Tj
+T*
+() Tj
+T*
+(Step 6: Controlled Failure Injection \(Reproduce\)) Tj
+T*
+(    docker compose restart redis) Tj
+T*
+(Then repeat Steps 1-5 while collecting timestamps.) Tj
+T*
+() Tj
+T*
+(Goal:) Tj
+T*
+(- Confirm whether failures are transient and recoverable or persistent.) Tj
+T*
+(- Confirm offending service by seeing who fails first, not who reports last.) Tj
+T*
+() Tj
+T*
+(Root-Cause Decision Tree) Tj
+T*
+() Tj
+T*
+(- If redis unhealthy/unreachable first -> likely Redis root cause.) Tj
+T*
+(- If Redis healthy but api /readyz fails -> likely API logic/config issue.) Tj
+T*
+(- If API ready but web still fails -> likely web retry/upstream handling issue.) Tj
+T*
+(- If all probes pass but user still reports issue -> inspect request path details and stale) Tj
+T*
+(client/browser assumptions.) Tj
+T*
+() Tj
+T*
+(Evidence Log Template) Tj
+T*
+() Tj
+T*
+(Use this template while investigating:) Tj
+T*
+() Tj
+T*
+(    # Incident Notes) Tj
+T*
+(    - Time observed:) Tj
+T*
+(    - Trigger action \(if any\):) Tj
+T*
+(    - `docker compose ps` summary:) Tj
+T*
+(    - First error log line \(service + timestamp\):) Tj
+T*
+(    - `api /healthz` result:) Tj
+T*
+(    - `api /readyz` result:) Tj
+T*
+(    - `web /` result:) Tj
+ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 9 0 R >>
+endobj
+9 0 obj
+<< /Length 1446 >>
+stream
+BT
+/F1 10 Tf
+14 TL
+54 738 Td
+(    - Redis CLI results \(`PING`, `INCR`, `GET`\):) Tj
+T*
+(    - Suspected offending service:) Tj
+T*
+(    - Why \(evidence-based\):) Tj
+T*
+(    - Fix applied:) Tj
+T*
+(    - Post-fix verification:) Tj
+T*
+() Tj
+T*
+(Fix Strategy by Offender) Tj
+T*
+() Tj
+T*
+(Offender: Redis) Tj
+T*
+(- Check restart loops, resource pressure, or config issues.) Tj
+T*
+(- Keep API readiness dependent on actual Redis PING success.) Tj
+T*
+(- Allow temporary degradation and recovery instead of hard crash.) Tj
+T*
+() Tj
+T*
+(Offender: API) Tj
+T*
+(- Confirm REDIS_URL=redis://redis:6379 in Compose.) Tj
+T*
+(- Ensure /readyz checks real dependency path.) Tj
+T*
+(- Avoid reporting ready when dependency calls fail.) Tj
+T*
+() Tj
+T*
+(Offender: Web) Tj
+T*
+(- Increase retry attempts/backoff for transient upstream outages.) Tj
+T*
+(- Return explicit 503 with context when upstream unavailable.) Tj
+T*
+(- Avoid permanent failure state after dependency recovers.) Tj
+T*
+() Tj
+T*
+(Closure Checklist) Tj
+T*
+() Tj
+T*
+(- Root cause identified with command evidence.) Tj
+T*
+(- Fix applied to offending service.) Tj
+T*
+(- docker compose ps returns healthy steady state.) Tj
+T*
+(- Endpoint probes \(/healthz, /readyz, /\) pass as expected.) Tj
+T*
+(- Failure injection \(restart redis\) confirms graceful recovery.) Tj
+T*
+() Tj
+T*
+(A forensic workflow is successful when another investigator can replay your notes and reach the) Tj
+T*
+(same conclusion.) Tj
+ET
+endstream
+endobj
+xref
+0 10
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000135 00000 n 
+0000000205 00000 n 
+0000000331 00000 n 
+0000002522 00000 n 
+0000002648 00000 n 
+0000004748 00000 n 
+0000004874 00000 n 
+trailer
+<< /Size 10 /Root 1 0 R >>
+startxref
+6372
+%%EOF
