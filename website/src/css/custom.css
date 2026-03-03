@@ -138,3 +138,26 @@ body {
 [data-theme='dark'] .theme-doc-toc-mobile {
   border-left-color: rgba(148, 163, 184, 0.12);
 }
+
+.theme-doc-markdown a {
+  color: #0f5fa8;
+  text-decoration-color: rgba(15, 95, 168, 0.45);
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.14em;
+  transition: color 140ms ease, text-decoration-color 140ms ease;
+}
+
+.theme-doc-markdown a:hover {
+  color: #0b74c9;
+  text-decoration-color: #0b74c9;
+}
+
+[data-theme='dark'] .theme-doc-markdown a {
+  color: #8fc7ff;
+  text-decoration-color: rgba(143, 199, 255, 0.52);
+}
+
+[data-theme='dark'] .theme-doc-markdown a:hover {
+  color: #b9ddff;
+  text-decoration-color: #b9ddff;
+}

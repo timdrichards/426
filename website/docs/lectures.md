@@ -4,23 +4,14 @@ sidebar_position: 4
 
 # Lectures
 
-This page is the landing index for weekly lecture notes, demos, and references.
+## Weeks
 
-## Weekly lecture pages
-
-Use the pages below as your semester lecture templates:
-
-- [Week 01](/docs/weeks/week-01)
-- [Week 02](/docs/weeks/week-02)
-- [Week 03](/docs/weeks/week-03)
-- [Week 04](/docs/weeks/week-04)
 - [Week 05](/docs/weeks/week-05)
 - [Week 06](/docs/weeks/week-06)
-- [Week 07](/docs/weeks/week-07)
-- [Week 08](/docs/weeks/week-08)
-- [Week 09](/docs/weeks/week-09)
-- [Week 10](/docs/weeks/week-10)
-- [Week 11](/docs/weeks/week-11)
-- [Week 12](/docs/weeks/week-12)
-- [Week 13](/docs/weeks/week-13)
-- [Week 14](/docs/weeks/week-14)
+
+## Lectures
+
+- [Lecture 5.6 - Compose and Service Decomposition](/docs/weeks/week-05#lecture-56-compose-and-service-decomposition)
+- [Lecture 5.7 - Docker Compose (Foundations)](/docs/weeks/week-05#lecture-57-docker-compose-foundations)
+- [Lecture 6.8 - Resilience (Startup and Recovery)](/docs/weeks/week-06#lecture-68-resilience-startup-and-recovery)
+- [Lecture 6.9 - Workers, Queues, and Failure Isolation](/docs/weeks/week-06#lecture-69-workers-queues-and-failure-isolation)

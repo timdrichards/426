@@ -2,6 +2,10 @@
   "name": "426",
   "private": true,
   "scripts": {
-    "publish:website": "./scripts/publish-website.sh"
+    "publish:all": "./scripts/publish-website.sh",
+    "publish:website": "./scripts/publish-website.sh",
+    "generate:assignments-doc": "node ./scripts/generate-assignments-doc.js",
+    "sync:assignments": "./scripts/sync-assignments.sh",
+    "sync:assignments:drafts": "./scripts/sync-assignments.sh --include-drafts"
   }
 }

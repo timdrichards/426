@@ -9,6 +9,7 @@ SLIDES_DIR="${REPO_ROOT}/slides"
 CODE_DIR="${REPO_ROOT}/code"
 STATIC_DECKS_DIR="${REPO_ROOT}/website/static/decks"
 STATIC_CODE_DIR="${REPO_ROOT}/website/static/code"
+SYNC_ASSIGNMENTS_SCRIPT="${SCRIPT_DIR}/sync-assignments.sh"
 
 # Prefer the script name requested by user if it exists, fallback to current script.
 if [[ -x "${SCRIPT_DIR}/public-slidev-persistence.sh" ]]; then
@@ -23,6 +24,13 @@ if [[ ! -x "${DECK_PUBLISH_SCRIPT}" ]]; then
 fi
 
 cd "${REPO_ROOT}"
+
+if [[ -x "${SYNC_ASSIGNMENTS_SCRIPT}" ]]; then
+  echo "==> Syncing assignments into website docs/static"
+  "${SYNC_ASSIGNMENTS_SCRIPT}"
+else
+  echo "Assignments sync script not found or not executable, skipping: ${SYNC_ASSIGNMENTS_SCRIPT}"
+fi
 
 echo "==> Publishing Slidev decks from ${SLIDES_DIR}"
 mkdir -p "${STATIC_DECKS_DIR}"
@@ -60,9 +68,9 @@ else
   echo "Code directory not found, skipping."
 fi
 
-publish_status="$(git status --porcelain -- website/static/decks website/static/code)"
+publish_status="$(git status --porcelain -- website/static/decks website/static/code website/docs/assignments website/docs/assignments.md)"
 if [[ -z "${publish_status}" ]]; then
-  echo "No publish output changes detected in website/static/decks or website/static/code."
+  echo "No publish output changes detected in synced assignments or website assets."
   exit 0
 fi
 

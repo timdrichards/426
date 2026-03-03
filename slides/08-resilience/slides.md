@@ -13,6 +13,7 @@ mdc: true
 duration: 75min
 lineNumbers: true
 highlighter: shiki
+routerMode: hash
 ---
 
 # 08 Resilience
