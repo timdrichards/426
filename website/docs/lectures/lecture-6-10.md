@@ -1,12 +1,10 @@
 ---
-title: 'Lecture 6.10 - Idempotency and Duplicate Delivery Safety'
+title: 'Lecture 10 - Idempotency and Duplicate Delivery Safety'
 sidebar_position: 5
-slug: /lectures/6-10
+slug: /lectures/10
 ---
 
-# Lecture 6.10 - Idempotency and Duplicate Delivery Safety
-
-Week: 06
+# Lecture 10 - Idempotency and Duplicate Delivery Safety
 
 In this lecture, students examine at-least-once delivery failure windows and implement idempotency guards in workers. They compare behavior before and after adding a claim-once pattern to ensure one side effect per logical job.
 

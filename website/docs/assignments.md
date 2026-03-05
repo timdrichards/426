@@ -18,7 +18,7 @@ All coursework is organized by category in `website/docs/assignments/`.
 
 ### Exercises
 
-- Description: Short applied work to practice weekly concepts with quick feedback.
+- Description: Short applied work to practice lecture concepts with quick feedback.
 - Release: Usually posted after lecture.
 - Submission: Submit on Canvas unless the prompt requires a repo link.
 

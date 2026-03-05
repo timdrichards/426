@@ -1,12 +1,10 @@
 ---
-title: 'Lecture 5.6 - Compose and Service Decomposition'
+title: 'Lecture 06 - Compose and Service Decomposition'
 sidebar_position: 1
-slug: /lectures/5-6
+slug: /lectures/06
 ---
 
-# Lecture 5.6 - Compose and Service Decomposition
-
-Week: 05
+# Lecture 06 - Compose and Service Decomposition
 
 This lecture has not been added yet.
 
