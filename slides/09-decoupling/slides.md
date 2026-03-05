@@ -4,7 +4,7 @@ background: https://cover.sli.dev
 title: 09 Decoupling
 info: |
   ## 09 Decoupling
-  Workers, queues, and idempotent async processing
+  Workers, queues, and async processing
 class: text-center
 drawings:
   persist: false
@@ -34,8 +34,7 @@ Today is a tutorial-style class:
 - Mini-lecture 1: Redis queue primer (mental model + operations)
 - Activity 1 (10 min): add queue + worker
 - Debrief + mini-lecture 2: failure isolation and reliability patterns
-- Demo 2: duplicates under at-least-once delivery
-- Activity 2 (10 min): add idempotency guard
+- Reliability checks: backlog + worker downtime
 - Wrap-up: connect architecture to reliability tradeoffs
 
 ---
@@ -51,7 +50,7 @@ By end of class, you should be able to:
 - Introduce a dedicated background worker
 - Use queue-based producer/consumer communication
 - Isolate request-path failures from async job failures
-- Explain at-least-once delivery and why idempotency is required
+- Explain decoupling tradeoffs (latency, isolation, and operational complexity)
 
 ::right::
 
@@ -369,7 +368,7 @@ What we observed:
 
 - slow work inflated response time
 - request success depended on side-effect timing
-- retries at client could duplicate work
+- retries and failures now have an explicit queue boundary to absorb pressure
 
 ---
 class: text-2xl
@@ -625,12 +624,12 @@ Core pattern terms:
 
 - **Producer**: creates jobs and enqueues
 - **Consumer/Worker**: dequeues and processes
-- **Visibility/failure window**: where duplicates can occur
+- **Backlog**: queued work waiting to be processed
 - **Retry strategy**: when processing fails
 
 Important truth:
 
-- Real systems often provide at-least-once delivery, not exactly-once.
+- Decoupling improves user-facing reliability but adds operational complexity.
 
 ---
 class: text-2xl code-size-sm
@@ -707,22 +706,22 @@ Now API and worker can fail/restart independently.
 class: text-xl
 ---
 
-# Demo 2: Duplicate Delivery vs Idempotency
+# Reliability Check: Worker Downtime + Backlog
 
-Use folder: `code/09-decoupling/mini-lecture-2`
+Use folder: `code/09-decoupling/mini-lecture-1`
 
 Run this sequence:
 
 1. `docker compose up --build -d`
-2. `docker compose run --rm demo no-idem-observe`
-3. `docker compose run --rm demo idem-observe`
-4. `docker compose run --rm demo no-idem-load 8 2`
-5. `docker compose run --rm demo idem-load 8 2`
+2. `docker compose stop worker`
+3. `docker compose run --rm demo submit-burst 12 4`
+4. `docker compose start worker`
+5. `docker compose logs -f worker`
 
 **Expected observation:**
 
-- no-idem pipeline repeats side effects for duplicate submissions
-- idem pipeline keeps side effects near one per unique `jobId`
+- API still accepts and queues while worker is stopped
+- backlog drains after worker restart
 
 ---
 class: text-2xl
@@ -730,131 +729,27 @@ layout: two-cols-header
 layoutClass: gap-12 no-wrap-header gap-x-12 gap-y-0
 ---
 
-# At-Least-Once: Where Duplicates Happen
+# Failure Isolation: What Broke vs What Stayed Healthy
 
 ::left::
 
-**Potential failure window:**
+**When worker is down:**
 
-1. worker pops job
-2. side effect succeeds (email sent)
-3. worker crashes before recording success
-4. job is retried
+1. API can still accept requests
+2. queue depth increases
+3. processing latency shifts to backlog
+4. user-facing latency stays low
 
 ::right::
 
 **Consequence:**
 
-- external side effect may happen twice
-- this is not rare; it is expected in distributed systems
+- request path and processing path fail independently
+- this is the main decoupling benefit
 
 <Callout class="mt-4" title="Design implication" tone="warning">
-If retries are possible, handlers must be idempotent.
+Queues buffer failure and burst pressure, but you still need monitoring and recovery playbooks.
 </Callout>
-
----
-class: text-xl
-layout: two-cols
-layoutClass: gap-x-20 gap-y-0 no-wrap-header
----
-
-# What is Idempotency?
-
-::left::
-
-**Definition (plain English):**
-
-Running the same operation multiple times has the same final effect as running it once.
-
-**Examples:**
-
-- setting a profile name to `"Alex"` is idempotent
-- charging a credit card twice is **not** idempotent
-
-**In our class context:**
-
-- processing the same `jobId` twice should not produce two side effects
-
-::right::
-
-<div class="origin-center scale-90">
-
-```mermaid
-flowchart TD
-  J[Job with jobId=123] --> P1[Process attempt #1]
-  J --> P2[Process attempt #2]
-  P1 --> E1[Side effect applied]
-  P2 --> G{Already processed?}
-  G -->|Yes| S[Skip side effect]
-  G -->|No| E2[Apply side effect]
-```
-
-</div>
-
-At-least-once delivery means duplicates are possible, so idempotency protects correctness.
-
----
-class: text-2xl
----
-
-# Idempotency Strategy
-
-Goal: repeated processing of same job should have same end result.
-
-**Practical patterns:**
-
-- include stable idempotency key (`jobId`)
-- check/store processed status before side effect
-- skip if already processed
-- make side-effect writes conditional when possible
-
-**Redis option:**
-
-- key: `processed:<jobId>`
-- claim once with `SET processed:<jobId> 1 NX EX 86400`
-
----
-class: text-base code-size-sm mt-0
----
-
-# Worker Guard Example (Idempotent)
-
-```js
-async function processJobIdempotent(job) {
-  const lockKey = `processed:${job.jobId}`
-  const claimed = await redis.set(lockKey, '1', { NX: true, EX: 86400 })
-
-  if (!claimed) {
-    console.log('duplicate skipped', job.jobId)
-    return
-  }
-
-  await sendEmail(job.payload)
-  await db.insertJobAudit({ jobId: job.jobId, status: 'done' })
-}
-```
-
----
-class: text-base code-size-sm mt-0
----
-
-# Worker Guard Example (Idempotent)
-
-```js
-  const claimed = await redis.set(lockKey, '1', { NX: true, EX: 86400 })
-```
-
-What this line does:
-
-- `lockKey` -> unique key for this job (for example `processed:abc123`)
-- `'1'` -> marker value meaning "already claimed/processed"
-- `NX: true` -> set key **only if it does not already exist**
-- `EX: 86400` -> expire key in 86,400 seconds (24 hours)
-
-How to read `claimed`:
-
-- truthy -> first processor wins, run side effect
-- falsy -> duplicate delivery, skip side effect
 
 ---
 layout: two-cols-header
@@ -862,37 +757,35 @@ layoutClass: gap-8 compact-header
 class: text-lg
 ---
 
-## Activity 2 (10 minutes): Add Idempotency + Test It
+## Activity 1 Extension (10 minutes): Failure Isolation Drill
 
 ::left::
 
-Implement in your worker:
+Run this drill:
 
-1. Use `jobId` as idempotency key.
-2. Add Redis `SET NX` claim guard.
-3. Log `duplicate skipped` for repeats.
+1. Stop the worker.
+2. Send a burst of API requests.
+3. Restart worker and confirm backlog drains.
 
-Use folder: `code/09-decoupling/activity-2`
+Use folder: `code/09-decoupling/activity-1`
 
-Then simulate duplicate delivery:
-
-- enqueue same `jobId` twice
-- or re-run same payload with same id
+Then explain what changed in each layer (API, queue, worker).
 
 ::right::
 
 Verify:
 
-- side effect executes once
-- second attempt is skipped
-- logs clearly show one processed + one skipped
+- API still returns quickly while worker is down
+- queue depth grows during downtime
+- worker drains jobs after restart
 
 Suggested commands:
 
-- `docker compose run --rm demo duplicate-observe`
-- `docker compose run --rm demo duplicate-load 8 2`
+- `docker compose stop worker`
+- `docker compose run --rm demo submit-burst 10 4`
+- `docker compose start worker`
 - `docker compose logs -f worker`
-- `docker compose exec redis redis-cli KEYS 'processed:*'`
+- `docker compose exec redis redis-cli LLEN jobs`
 
 ---
 class: text-2xl
@@ -903,8 +796,8 @@ class: text-2xl
 With your partner, answer:
 
 1. What changed when worker was down?
-2. Where did you enforce idempotency?
-3. What evidence showed duplicate protection worked?
+2. What evidence showed queue buffering worked?
+3. What tradeoff did decoupling introduce?
 
 Be ready to show one terminal output snippet.
 
@@ -918,8 +811,7 @@ class: text-2xl
 | --- | --- | --- |
 | Inline sync processing | Simple control flow | Latency + coupled failures |
 | Queue + worker | Fast requests + isolation | More moving parts |
-| At-least-once retries | Better eventual completion | Possible duplicates |
-| Idempotency keys | Safe retries | Extra state and logic |
+| Queue buffering under downtime | Better service continuity | Backlog management required |
 
 ---
 class: text-2xl
@@ -932,9 +824,9 @@ Today you practiced:
 - introducing a dedicated worker
 - queue-based producer/consumer communication
 - isolating request path from async failures
-- making at-least-once processing safe with idempotency
+- handling worker downtime with queue buffering
 
-If you can explain why `202 + queue + idempotent worker` is safer than inline side effects, you got the core idea.
+If you can explain why `202 + queue + worker` is safer than inline side effects, you got the core idea.
 
 ---
 class: text-2xl
