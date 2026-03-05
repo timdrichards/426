@@ -6,6 +6,7 @@
     "publish:website": "./scripts/publish-website.sh",
     "generate:assignments-doc": "node ./scripts/generate-assignments-doc.js",
     "sync:assignments": "./scripts/sync-assignments.sh",
-    "sync:assignments:drafts": "./scripts/sync-assignments.sh --include-drafts"
+    "sync:assignments:drafts": "./scripts/sync-assignments.sh --include-drafts",
+    "slides:new": "./scripts/new-slide-deck.sh"
   }
 }

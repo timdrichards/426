@@ -1,0 +1,80 @@
+name: decoupling-mini-2
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6382:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 2s
+      retries: 10
+
+  api-no-idem:
+    build: ./api
+    environment:
+      - PORT=3000
+      - REDIS_URL=redis://redis:6379
+      - PIPELINE=no-idem
+      - QUEUE_NAME=jobs:no-idem
+    depends_on:
+      redis:
+        condition: service_healthy
+    ports:
+      - "3010:3000"
+
+  api-idem:
+    build: ./api
+    environment:
+      - PORT=3000
+      - REDIS_URL=redis://redis:6379
+      - PIPELINE=idem
+      - QUEUE_NAME=jobs:idem
+    depends_on:
+      redis:
+        condition: service_healthy
+    ports:
+      - "3012:3000"
+
+  worker-no-idem:
+    build: ./worker
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - PIPELINE=no-idem
+      - QUEUE_NAME=jobs:no-idem
+      - MODE=no-idem
+      - WORK_SIM_MIN_MS=200
+      - WORK_SIM_MAX_MS=700
+      - IDEM_TTL_SEC=86400
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  worker-idem:
+    build: ./worker
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - PIPELINE=idem
+      - QUEUE_NAME=jobs:idem
+      - MODE=idem
+      - WORK_SIM_MIN_MS=200
+      - WORK_SIM_MAX_MS=700
+      - IDEM_TTL_SEC=86400
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  demo:
+    build: ./demo-runner
+    profiles: ["tools"]
+    environment:
+      - NO_IDEM_URL=http://api-no-idem:3000
+      - IDEM_URL=http://api-idem:3000
+      - DEMO_TIMEOUT_SEC=20
+    depends_on:
+      api-no-idem:
+        condition: service_started
+      api-idem:
+        condition: service_started
+    entrypoint: ["/runner/run.sh"]
