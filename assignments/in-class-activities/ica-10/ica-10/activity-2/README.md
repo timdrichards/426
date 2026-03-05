@@ -1,4 +1,4 @@
-# 09 Decoupling Activity 2 Starter
+# 10 Idempotency Activity Starter
 
 This starter is for the idempotency activity.
 
@@ -13,7 +13,7 @@ Your task is to add idempotency and prove duplicate side effects are prevented.
 ## Start
 
 ```bash
-cd code/09-decoupling/activity-2
+cd code/10-idempotency/activity-2
 docker compose up --build
 ```
 

@@ -17,17 +17,15 @@ dueDate: '2026-03-05'
 
 This class is about decoupling slow, failure-prone work from the request path.
 
-You will complete two connected activities:
+You will complete one activity:
 
 1. **Activity 1**: move from synchronous inline processing to queue-based worker processing.
-2. **Activity 2**: make queue processing safe under duplicate delivery by adding idempotency.
 
 Why this matters in real systems:
 
 - user-facing APIs should stay fast under burst traffic
 - async workers isolate failures from request/response traffic
-- retries and at-least-once delivery are common in distributed systems
-- idempotency prevents duplicate business side effects (double email, double charge, etc.)
+- queue buffering allows continued request acceptance during worker downtime
 
 You will use Docker Compose and built-in demo runner containers, so you do **not** need `curl` installed locally.
 
@@ -36,18 +34,15 @@ You will use Docker Compose and built-in demo runner containers, so you do **not
 Lecture 09 code is organized under `code/09-decoupling`:
 
 - `activity-1/`: starter for queue + worker decoupling
-- `activity-2/`: starter for idempotency implementation
 - `mini-lecture-1/`: instructor demo stack (pain vs relief)
-- `mini-lecture-2/`: instructor demo stack (duplicates vs idempotency)
 
 For this assignment, focus on:
 
 - `code/09-decoupling/activity-1`
-- `code/09-decoupling/activity-2`
 
 ## Testing Scripts (Container-Based)
 
-Each activity includes a `demo` service in `compose.yml` that runs testing scripts from inside a container.
+Activity 1 includes a `demo` service in `compose.yml` that runs testing scripts from inside a container.
 
 General pattern:
 
@@ -70,19 +65,6 @@ Run from `code/09-decoupling/activity-1`:
   - expects your Activity 1 implementation (`202` + queued response)
 - `queue-load [count] [concurrency]`
   - load test for your queued implementation
-- `help`
-  - prints command usage
-
-### Activity 2 demo commands
-
-Run from `code/09-decoupling/activity-2`:
-
-- `duplicate-observe [job_id] [submissions]`
-  - submits same `jobId` multiple times, then shows attempts/effects
-- `duplicate-load [unique_jobs] [duplicates_per_job]`
-  - sends duplicates in bulk, summarizes total side effects
-- `poll-job <job_id>`
-  - inspect one job/effect summary
 - `help`
   - prints command usage
 
@@ -187,76 +169,6 @@ You are done when:
 - worker consumes from queue and processes jobs independently
 - worker downtime does not immediately break request acceptance
 
-## Activity 2 - Idempotency Under Duplicate Delivery
-
-### Goal
-
-Add idempotency to queue processing so repeated delivery of same `jobId` does not duplicate side effects.
-
-### Starter behavior
-
-In Activity 2 starter, worker processes duplicates multiple times by default (idempotency not implemented).
-
-### Step 0: Start and observe duplicate problem
-
-```bash
-cd code/09-decoupling/activity-2
-docker compose up --build -d
-docker compose run --rm demo duplicate-observe
-docker compose run --rm demo duplicate-load 8 2
-```
-
-Interpretation:
-
-- before idempotency, `observed_effects_total` should be near total submissions
-- duplicate deliveries cause duplicate side effects
-
-### Step 1: Implement idempotency guard in worker
-
-Edit `worker/worker.js` (TODO section).
-
-Implement logic like:
-
-1. build idempotency key from `jobId` (for example `processed:<pipeline>:<jobId>`)
-2. claim once using Redis `SET key 1 NX EX <ttl>`
-3. if claim fails:
-   - skip side effect execution
-   - log duplicate skip
-   - update job status/counters appropriately
-4. if claim succeeds:
-   - run side effect
-   - mark completion
-
-### Step 2: Re-test duplicate scenarios
-
-```bash
-docker compose up --build -d
-docker compose run --rm demo duplicate-observe
-docker compose run --rm demo duplicate-load 8 2
-docker compose logs -f worker
-```
-
-Expected after idempotency:
-
-- one side effect per unique `jobId`
-- repeated submissions are skipped, not re-executed
-- in load test, `observed_effects_total` should trend toward `unique_jobs`
-
-### Step 3: Optional Redis verification
-
-```bash
-docker compose exec redis redis-cli
-KEYS 'processed:*'
-```
-
-### Activity 2 success criteria
-
-You are done when:
-
-- duplicate submissions of same `jobId` do not repeat side effects
-- worker logs clearly show duplicate-skip events
-- load test output demonstrates reduced side-effect count compared to baseline
-
 ## Deliverables
 
 Submit all of the following:
@@ -264,9 +176,7 @@ Submit all of the following:
 1. **Activity 1 evidence**
    - screenshot or log snippet showing fast queued API responses (`202`)
    - screenshot or log snippet showing worker draining jobs
-2. **Activity 2 evidence**
-   - `duplicate-observe` output before and after idempotency (or equivalent proof)
-   - `duplicate-load` output demonstrating reduction in side-effect count
+   - screenshot or log snippet showing successful backlog drain after worker restart
 
 ## Cleanup
 
@@ -274,5 +184,4 @@ When finished:
 
 ```bash
 cd code/09-decoupling/activity-1 && docker compose down
-cd code/09-decoupling/activity-2 && docker compose down
 ```
