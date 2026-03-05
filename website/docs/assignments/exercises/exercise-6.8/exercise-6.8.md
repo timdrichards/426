@@ -21,7 +21,7 @@ Exercises are guided practice for the lecture material. They are non-graded, but
 
 ## Why you are doing this (and why it matters later)
 
-[Lecture 08](/426/docs/weeks/week-06#lecture-68-resilience-startup-and-recovery) introduces the core reliability distinction between process startup and service readiness. In real systems, dependencies restart and transient failures happen. This exercise practices designing `/healthz` and `/readyz`, observing Compose health states, and injecting failures so students can prove the system degrades gracefully and recovers without manual intervention.
+[Lecture 6.8](/docs/lectures/6-8) introduces the core reliability distinction between process startup and service readiness. In real systems, dependencies restart and transient failures happen. This exercise practices designing `/healthz` and `/readyz`, observing Compose health states, and injecting failures so students can prove the system degrades gracefully and recovers without manual intervention.
 
 This exercise makes us practice:
 

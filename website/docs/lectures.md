@@ -4,15 +4,15 @@ sidebar_position: 4
 
 # Lectures
 
-## Weeks
+Use this page as the lecture index. Lecture numbering preserves week metadata:
 
-- [Week 05](/docs/weeks/week-05)
-- [Week 06](/docs/weeks/week-06)
+- `6.9` means Week 6, Lecture 9
+- `6.10` means Week 6, Lecture 10
 
-## Lectures
+## Lecture List
 
-- [Lecture 5.6 - Compose and Service Decomposition](/docs/weeks/week-05#lecture-56-compose-and-service-decomposition)
-- [Lecture 5.7 - Docker Compose (Foundations)](/docs/weeks/week-05#lecture-57-docker-compose-foundations)
-- [Lecture 6.8 - Resilience (Startup and Recovery)](/docs/weeks/week-06#lecture-68-resilience-startup-and-recovery)
-- [Lecture 6.9 - Workers, Queues, and Failure Isolation](/docs/weeks/week-06#lecture-69-workers-queues-and-failure-isolation)
-- [Lecture 6.10 - Idempotency and Duplicate Delivery Safety](/docs/weeks/week-06#lecture-610-idempotency-and-duplicate-delivery-safety)
+- [Lecture 5.6 - Compose and Service Decomposition](/docs/lectures/5-6)
+- [Lecture 5.7 - Docker Compose (Foundations)](/docs/lectures/5-7)
+- [Lecture 6.8 - Resilience (Startup and Recovery)](/docs/lectures/6-8)
+- [Lecture 6.9 - Workers, Queues, and Failure Isolation](/docs/lectures/6-9)
+- [Lecture 6.10 - Idempotency and Duplicate Delivery Safety](/docs/lectures/6-10)
