@@ -15,3 +15,4 @@ sidebar_position: 4
 - [Lecture 5.7 - Docker Compose (Foundations)](/docs/weeks/week-05#lecture-57-docker-compose-foundations)
 - [Lecture 6.8 - Resilience (Startup and Recovery)](/docs/weeks/week-06#lecture-68-resilience-startup-and-recovery)
 - [Lecture 6.9 - Workers, Queues, and Failure Isolation](/docs/weeks/week-06#lecture-69-workers-queues-and-failure-isolation)
+- [Lecture 6.10 - Idempotency and Duplicate Delivery Safety](/docs/weeks/week-06#lecture-610-idempotency-and-duplicate-delivery-safety)
