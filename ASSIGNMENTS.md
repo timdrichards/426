@@ -4,59 +4,36 @@ This file is for instructor/maintainer notes and is not part of the Docusaurus s
 
 ## Assignment Source Of Truth
 
-Assignments are authored from the top-level `assignments/` directory and synced into `website/` outputs.
+Assignments are authored directly under `website/`.
 
 General layout:
 
 ```text
-assignments/
-  exercises/
-    .gitkeep
-    exercise-6.8/
-      exercise-6.8.md
-      excalidraw/
-        # .excalidraw source diagrams
-      images/
-        # generated image assets for markdown references
-      exercise-6.8/
-        # exercise code
-  homework/
-    .gitkeep
-    homework-01/
-      homework-01.md
-      # optional homework-01/ code folder
-  project/
-    .gitkeep
-    project-01/
-      project-01.md
-      # optional project-01/ code folder
-  in-class-activities/
-    .gitkeep
-    activity-01/
-      activity-01.md
-      # optional activity-01/ code folder
+website/
+  assignments/
+    exercises/
+    homework/
+    project/
+    in-class-activities/
+  code/
+  slides/
+  docs/
+    assignments/
+  static/
+    code/
 ```
 
-Sync command:
+Website-first local preview:
 
 ```bash
-npm run sync:assignments
+npm run website:dev
 ```
 
-Include drafts (preview only):
+Website-first build:
 
 ```bash
-npm run sync:assignments:drafts
+npm run website:build
 ```
-
-The sync script will:
-
-1. Copy markdown into `website/docs/assignments/<type>/`.
-2. Copy each assignment folder into `website/docs/assignments/<type>/<assignment-name>/` (including markdown/images and other doc assets, but excluding raw code folders and `excalidraw/` sources).
-3. Export `excalidraw/*.excalidraw` diagrams to `images/*.png` before syncing.
-4. Zip code into `website/static/code/<assignment-name>.zip` when a matching code folder exists.
-5. Publish no zip when code folder is absent.
-6. Remove stale published markdown/zip files when source assignments are removed or moved to draft.
 
 Supported assignment types:
 
@@ -65,25 +42,12 @@ Supported assignment types:
 - `project`
 - `in-class-activities`
 
-## Drafts
+## Legacy Sync Workflow (Optional)
 
-Draft assignments are excluded from default sync.
-
-Two supported draft styles:
-
-1. Prefix the assignment folder with `_` (example: `_exercise-6.9`).
-2. Add `draft: true` in markdown frontmatter.
-
-Default sync skips drafts:
+Old top-level sync/copy behavior still exists for migration purposes:
 
 ```bash
-npm run sync:assignments
-```
-
-Preview sync includes drafts:
-
-```bash
-npm run sync:assignments:drafts
+npm run publish:legacy-sync
 ```
 
 ## Add a New Homework Page

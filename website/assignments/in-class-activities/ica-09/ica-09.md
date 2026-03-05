@@ -31,14 +31,14 @@ You will use Docker Compose and built-in demo runner containers, so you do **not
 
 ## Project Structure
 
-Lecture 09 code is organized under `website/website/docs/lectures/09/code`:
+Lecture 09 code is organized under `website/code/09-decoupling`:
 
 - `activity-1/`: starter for queue + worker decoupling
 - `mini-lecture-1/`: instructor demo stack (pain vs relief)
 
 For this assignment, focus on:
 
-- `website/website/docs/lectures/09/code/activity-1`
+- `website/code/09-decoupling/activity-1`
 
 ## Testing Scripts (Container-Based)
 
@@ -52,7 +52,7 @@ docker compose run --rm demo <command>
 
 ### Activity 1 demo commands
 
-Run from `website/website/docs/lectures/09/code/activity-1`:
+Run from `website/code/09-decoupling/activity-1`:
 
 - `baseline-observe`
   - sends one request and prints status/latency/JSON
@@ -85,7 +85,7 @@ In the starter, `POST /tasks` does slow work inline and may fail in the request 
 ### Step 0: Start stack and observe baseline
 
 ```bash
-cd website/website/docs/lectures/09/code/activity-1
+cd website/code/09-decoupling/activity-1
 docker compose up --build -d
 docker compose run --rm demo baseline-observe
 docker compose run --rm demo baseline-load 12 4
@@ -183,5 +183,5 @@ Submit all of the following:
 When finished:
 
 ```bash
-cd website/website/docs/lectures/09/code/activity-1 && docker compose down
+cd website/code/09-decoupling/activity-1 && docker compose down
 ```

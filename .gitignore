@@ -1,2 +1,8 @@
 node_modules
 dist
+.slidev
+
+# Keep generated Slidev artifacts out of lecture docs trees
+website/docs/lectures/*/slides/node_modules/
+website/docs/lectures/*/slides/dist/
+website/docs/lectures/*/slides/.slidev/

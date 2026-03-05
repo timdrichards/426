@@ -55,7 +55,18 @@ const config = {
         docs: {
           sidebarPath: './sidebars.js',
           // Keep underscore-prefixed docs in the repo without publishing them.
-          exclude: ['**/_*.md', '**/_*.mdx'],
+          exclude: [
+            '**/_*.md',
+            '**/_*.mdx',
+            '**/node_modules/**',
+            '**/dist/**',
+            '**/.slidev/**',
+            '**/lectures/*/code/**',
+            '**/lectures/*/slides/**',
+            '**/lectures/*/ica/**',
+            '**/lectures/*/ex/**',
+            '**/lectures/*/img/**',
+          ],
         },
         blog: false,
         theme: {
@@ -63,6 +74,20 @@ const config = {
         },
       }),
     ],
+  ],
+  plugins: [
+    function ignoreGeneratedWatchPaths() {
+      return {
+        name: 'ignore-generated-watch-paths',
+        configureWebpack() {
+          return {
+            watchOptions: {
+              ignored: ['**/node_modules/**', '**/dist/**', '**/.slidev/**'],
+            },
+          };
+        },
+      };
+    },
   ],
 
   themeConfig:

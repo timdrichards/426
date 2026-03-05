@@ -5,7 +5,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-ASSIGNMENTS_DIR="${REPO_ROOT}/assignments"
+ASSIGNMENTS_DIR="${REPO_ROOT}/website/assignments"
 WEBSITE_ASSIGNMENTS_DIR="${REPO_ROOT}/website/docs/assignments"
 WEBSITE_CODE_DIR="${REPO_ROOT}/website/static/code"
 INCLUDE_DRAFTS=false

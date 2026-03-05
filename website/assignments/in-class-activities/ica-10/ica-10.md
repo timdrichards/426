@@ -31,14 +31,14 @@ You will use Docker Compose and built-in demo runner containers, so you do **not
 
 ## Project Structure
 
-Lecture 10 code is organized under `website/website/docs/lectures/10/code`:
+Lecture 10 code is organized under `website/code/10-idempotency`:
 
 - `activity-2/`: starter for idempotency implementation
 - `mini-lecture-2/`: instructor demo stack (duplicates vs idempotency)
 
 For this assignment, focus on:
 
-- `website/website/docs/lectures/10/code/activity-2`
+- `website/code/10-idempotency/activity-2`
 
 ## Testing Scripts (Container-Based)
 
@@ -52,7 +52,7 @@ docker compose run --rm demo <command>
 
 ### Demo commands
 
-Run from `website/website/docs/lectures/10/code/activity-2`:
+Run from `website/code/10-idempotency/activity-2`:
 
 - `duplicate-observe [job_id] [submissions]`
   - submits same `jobId` multiple times, then shows attempts/effects
@@ -76,7 +76,7 @@ In starter code, worker processes duplicates multiple times by default (idempote
 ### Step 0: Start and observe duplicate problem
 
 ```bash
-cd website/website/docs/lectures/10/code/activity-2
+cd website/code/10-idempotency/activity-2
 docker compose up --build -d
 docker compose run --rm demo duplicate-observe
 docker compose run --rm demo duplicate-load 8 2
@@ -147,5 +147,5 @@ Submit all of the following:
 When finished:
 
 ```bash
-cd website/website/docs/lectures/10/code/activity-2 && docker compose down
+cd website/code/10-idempotency/activity-2 && docker compose down
 ```

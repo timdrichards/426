@@ -4,7 +4,7 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-Build a Slidev deck and publish it into website/static/decks.
+Build a Slidev deck directly into website/static/decks.
 
 Usage:
   scripts/publish-slidev-deck.sh [options] <deck_dir> [deck_slug]
@@ -21,8 +21,8 @@ Options:
   -h, --help               Show this help.
 
 Examples:
-  scripts/publish-slidev-deck.sh slides/09-persistence
-  scripts/publish-slidev-deck.sh --site-base /326/ slides/09-persistence week-09
+  scripts/publish-slidev-deck.sh website/docs/lectures/09/slides 09
+  scripts/publish-slidev-deck.sh --site-base /326/ website/docs/lectures/09/slides 09
 EOF
 }
 
@@ -105,7 +105,6 @@ if [[ -z "${DECK_SLUG}" ]]; then
 fi
 
 DECK_BASE_PATH="${SITE_BASE}decks/${DECK_SLUG}/"
-DECK_DIST_DIR="${DECK_DIR}/dist"
 TARGET_DIR="${REPO_ROOT}/website/static/decks/${DECK_SLUG}"
 
 echo "Repo root:        ${REPO_ROOT}"
@@ -115,23 +114,23 @@ echo "Deck base path:   ${DECK_BASE_PATH}"
 echo "Target dir:       ${TARGET_DIR}"
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then
-  echo "[dry-run] Would run: npm run build -- --base ${DECK_BASE_PATH}"
+  echo "[dry-run] Would run: npm run build -- --base ${DECK_BASE_PATH} --out ${TARGET_DIR}"
   if [[ "${DO_INSTALL}" -eq 1 ]]; then
     echo "[dry-run] Would run: npm install"
   fi
-  echo "[dry-run] Would sync: ${DECK_DIST_DIR}/ -> ${TARGET_DIR}/"
+  echo "[dry-run] Would remove existing: ${TARGET_DIR}"
   exit 0
 fi
+
+rm -rf "${TARGET_DIR}"
+mkdir -p "$(dirname "${TARGET_DIR}")"
 
 pushd "${DECK_DIR}" >/dev/null
 if [[ "${DO_INSTALL}" -eq 1 ]]; then
   npm install
 fi
-npm run build -- --base "${DECK_BASE_PATH}"
+npm run build -- --base "${DECK_BASE_PATH}" --out "${TARGET_DIR}"
 popd >/dev/null
-
-mkdir -p "${TARGET_DIR}"
-rsync -a --delete "${DECK_DIST_DIR}/" "${TARGET_DIR}/"
 
 echo
 echo "Deck published."

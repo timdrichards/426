@@ -4,16 +4,14 @@ This repository contains course materials and a Docusaurus site used to publish 
 
 ## Repo layout
 
-- `lectures/`: lecture content, demos, and related assets
-- `website/`: Docusaurus site (docs, theme, config)
+- `website/`: source of truth for published docs and assets (edit here first)
+- `lectures/`: legacy/archival lecture content
 - `.github/workflows/`: automation, including GitHub Pages deployment
 
 ## Run the site locally
 
 ```bash
-cd website
-npm install
-npm start
+npm run website:dev
 ```
 
 Docusaurus will print a local URL (typically `http://localhost:3000/426/` for this repo setup).
@@ -21,8 +19,21 @@ Docusaurus will print a local URL (typically `http://localhost:3000/426/` for th
 ## Build the site locally
 
 ```bash
-cd website
-npm run build
+npm run website:build
+```
+
+## Publish Workflow
+
+Default publish is website-first and does not copy/sync from lecture content folders under `website/docs/lectures/*`:
+
+```bash
+npm run publish:website
+```
+
+If you explicitly want the old sync/copy behavior:
+
+```bash
+npm run publish:legacy-sync
 ```
 
 ## Deployment
