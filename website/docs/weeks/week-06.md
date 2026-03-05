@@ -37,6 +37,6 @@ In this lecture, we add `redis` as a dependency and focus on startup correctness
 
 In this lecture, we introduce a dedicated background worker and queue-based communication so asynchronous tasks are decoupled from synchronous request handling. Students examine retry behavior in async pipelines, discuss at-least-once delivery implications, and apply idempotency patterns to avoid duplicate side effects.
 
-- [Slides](/docs/material-not-available)
+- [Slides](pathname:///decks/09-decoupling/index.html)
 - [Notes](/docs/material-not-available)
-- [Code](/docs/material-not-available)
+- [Code](/code/09-decoupling.zip)
