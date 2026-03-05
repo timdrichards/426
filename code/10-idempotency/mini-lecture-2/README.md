@@ -9,7 +9,7 @@ This stack demonstrates the "pain and relief" of duplicate job delivery:
 ## Start
 
 ```bash
-cd code/09-decoupling/mini-lecture-2
+cd code/10-idempotency/mini-lecture-2
 docker compose up --build -d
 ```
 
