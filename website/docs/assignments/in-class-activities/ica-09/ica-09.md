@@ -9,6 +9,10 @@ dueDate: '2026-03-05'
 
 # In-Class Activity 09 - Decoupling
 
+## Starter Code
+
+- [ica-09.zip](/code/ica-09.zip)
+
 ## Overview
 
 This class is about decoupling slow, failure-prone work from the request path.
