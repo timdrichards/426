@@ -1,3 +1,15 @@
+---
+id: ica-09
+title: 'In-Class Activity 09'
+slug: /assignments/ica/ica-09
+releaseDate: '2026-03-03'
+dueDate: '2026-03-03'
+kind: In-Class Activity
+lateDaysAllowed: 0
+isAssignment: true
+assignmentType: in-class-activities
+---
+
 # 09 Decoupling Activity 1 Starter
 
 This starter matches the `website/docs/lectures/09/slides` hands-on activities.

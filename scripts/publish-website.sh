@@ -90,6 +90,9 @@ else
   publish_all_slides
 fi
 
+echo "==> Generating assignments index"
+node "${SCRIPT_DIR}/generate-assignments-doc.js"
+
 echo "==> Building Docusaurus from website/"
 (
   cd "${WEBSITE_DIR}"

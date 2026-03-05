@@ -63,8 +63,6 @@ const config = {
             '**/.slidev/**',
             '**/lectures/*/code/**',
             '**/lectures/*/slides/**',
-            '**/lectures/*/ica/**',
-            '**/lectures/*/ex/**',
             '**/lectures/*/img/**',
           ],
         },
@@ -82,7 +80,7 @@ const config = {
         configureWebpack() {
           return {
             watchOptions: {
-              ignored: ['**/node_modules/**', '**/dist/**', '**/.slidev/**'],
+              ignored: /(^|[\\/])(node_modules|dist|\.slidev)([\\/]|$)/,
             },
           };
         },

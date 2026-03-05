@@ -72,12 +72,18 @@ while IFS= read -r deck_dir; do
   echo " -> lecture ${lecture_name}"
 
   pushd "${deck_dir}" >/dev/null
-  if [[ "${DO_INSTALL}" -eq 1 || ! -d "${deck_dir}/node_modules" ]]; then
+  if [[ "${DO_INSTALL}" -eq 1 ]]; then
     npm install
+  elif [[ ! -d "${deck_dir}/node_modules" ]]; then
+    echo "Error: missing dependencies in ${deck_dir}. Run with --install." >&2
+    exit 1
   fi
   npm run build -- --base "/$(basename "${REPO_ROOT}")/decks/${lecture_name}/" --out "${out_dir}"
   popd >/dev/null
 done < <(find "${LECTURES_ROOT}" -mindepth 2 -maxdepth 2 -type d -name slides | sort)
+
+echo "==> Generating assignments index"
+node "${SCRIPT_DIR}/generate-assignments-doc.js"
 
 echo "==> Building Docusaurus website"
 (

@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import {useEffect, useMemo, useState} from 'react';
 import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
@@ -10,7 +11,7 @@ const primaryCards = [
   {
     title: 'Syllabus',
     description: 'Policies, expectations, grading, and course logistics.',
-    to: '/docs/syllabus',
+    to: '/docs/admin/syllabus',
   },
   {
     title: 'Schedule',
@@ -31,6 +32,7 @@ const primaryCards = [
 
 const FIVE_DAYS = 5;
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
+const ASSIGNMENT_PANEL_STORAGE_KEY = 'course426.assignmentPanel.openState.v1';
 
 function formatDate(dateString) {
   if (!dateString) return 'TBD';
@@ -50,6 +52,47 @@ function daysUntilDate(dateString) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   return Math.floor((due.getTime() - today.getTime()) / MS_PER_DAY);
+}
+
+function formatDaysUntilDue(daysUntilDue) {
+  if (daysUntilDue === null) return 'No due date';
+  if (daysUntilDue === 0) return 'Due today';
+  if (daysUntilDue > 0) return `${daysUntilDue}d left`;
+  return `${Math.abs(daysUntilDue)}d overdue`;
+}
+
+function getAssignmentShortName(item) {
+  if (typeof item?.id === 'string' && item.id.trim()) return item.id.trim();
+  const title = (item?.title ?? '').trim();
+  if (!title) return 'assignment';
+  return title
+    .replace(/^In-Class Activity\s*/i, 'ICA ')
+    .replace(/^Exercise\s*/i, 'Ex ')
+    .replace(/^Homework\s*/i, 'HW ')
+    .split(/\s+/)
+    .slice(0, 3)
+    .join(' ');
+}
+
+function getCategoryDueSummary(items) {
+  const withDue = (items ?? [])
+    .filter(Boolean)
+    .map(item => ({
+      item,
+      daysUntilDue: daysUntilDate(item.dueDate),
+    }))
+    .filter(entry => entry.daysUntilDue !== null);
+
+  if (withDue.length === 0) return null;
+
+  withDue.sort((a, b) => {
+    if (a.daysUntilDue >= 0 && b.daysUntilDue < 0) return -1;
+    if (a.daysUntilDue < 0 && b.daysUntilDue >= 0) return 1;
+    return Math.abs(a.daysUntilDue) - Math.abs(b.daysUntilDue);
+  });
+
+  const next = withDue[0];
+  return `${getAssignmentShortName(next.item)} • ${formatDaysUntilDue(next.daysUntilDue)}`;
 }
 
 function getAssignmentState(item) {
@@ -95,7 +138,7 @@ function getDueCardStyle(item) {
 }
 
 function sortByDueDate(items) {
-  return [...items].sort((a, b) => {
+  return [...items].filter(Boolean).sort((a, b) => {
     const priorityDiff = getDuePriority(a) - getDuePriority(b);
     if (priorityDiff !== 0) return priorityDiff;
 
@@ -112,16 +155,37 @@ function groupedAssignments() {
   const grouped = new Map(assignmentCategories.map(category => [category.key, []]));
 
   assignments.forEach(item => {
+    if (!item || typeof item !== 'object' || !item.type) {
+      return;
+    }
     if (!grouped.has(item.type)) {
       grouped.set(item.type, []);
     }
     grouped.get(item.type).push(item);
   });
 
-  return assignmentCategories.map(category => ({
-    ...category,
-    items: sortByDueDate(grouped.get(category.key) ?? []),
-  }));
+  return assignmentCategories
+    .map((category, index) => ({
+      ...category,
+      _originalIndex: index,
+      items: sortByDueDate(grouped.get(category.key) ?? []),
+    }))
+    .sort((a, b) => {
+      const aEmpty = a.items.length === 0;
+      const bEmpty = b.items.length === 0;
+      if (aEmpty !== bEmpty) {
+        return aEmpty ? 1 : -1;
+      }
+      return a._originalIndex - b._originalIndex;
+    })
+    .map(({_originalIndex, ...category}) => category);
+}
+
+function buildDefaultOpenState(categories) {
+  return categories.reduce((acc, category, index) => {
+    acc[category.key] = index === 0;
+    return acc;
+  }, {});
 }
 
 function CourseCards() {
@@ -145,7 +209,49 @@ function CourseCards() {
 }
 
 function AssignmentPanel() {
-  const categories = groupedAssignments();
+  const categories = useMemo(() => groupedAssignments(), []);
+  const [openState, setOpenState] = useState({});
+
+  useEffect(() => {
+    const defaults = buildDefaultOpenState(categories);
+    let nextState = defaults;
+
+    if (typeof window !== 'undefined') {
+      try {
+        const savedRaw = window.localStorage.getItem(ASSIGNMENT_PANEL_STORAGE_KEY);
+        if (savedRaw) {
+          const saved = JSON.parse(savedRaw);
+          nextState = categories.reduce((acc, category, index) => {
+            if (typeof saved?.[category.key] === 'boolean') {
+              acc[category.key] = saved[category.key];
+            } else {
+              acc[category.key] = index === 0;
+            }
+            return acc;
+          }, {});
+        }
+      } catch {
+        nextState = defaults;
+      }
+    }
+
+    setOpenState(nextState);
+  }, [categories]);
+
+  const handleCategoryToggle = (categoryKey, isOpen) => {
+    setOpenState(prev => {
+      const next = {
+        ...prev,
+        [categoryKey]: isOpen,
+      };
+
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(ASSIGNMENT_PANEL_STORAGE_KEY, JSON.stringify(next));
+      }
+
+      return next;
+    });
+  };
 
   return (
     <section className={styles.assignmentsSection} aria-label="Assignment categories">
@@ -160,7 +266,11 @@ function AssignmentPanel() {
 
           <div className={styles.assignmentCategoryList}>
             {categories.map((category, index) => (
-              <details key={category.key} className={styles.categorySection} open={index === 0}>
+              <details
+                key={category.key}
+                className={styles.categorySection}
+                open={openState[category.key] ?? index === 0}
+                onToggle={event => handleCategoryToggle(category.key, event.currentTarget.open)}>
                 <summary className={styles.categorySummary}>
                   <div className={styles.categoryTitleRow}>
                     <Heading as="h3" className={styles.categoryTitle}>
@@ -168,6 +278,16 @@ function AssignmentPanel() {
                     </Heading>
                     <span className={styles.weightBadge}>Weight: {category.weight}</span>
                     <span className={styles.categoryCount}>{category.items.length} items</span>
+                    {getCategoryDueSummary(category.items) && (
+                      <>
+                        <span className={styles.summarySeparator} aria-hidden="true">
+                          |
+                        </span>
+                        <span className={styles.summaryDueBadge}>
+                          {getCategoryDueSummary(category.items)}
+                        </span>
+                      </>
+                    )}
                   </div>
                 </summary>
 
@@ -186,24 +306,34 @@ function AssignmentPanel() {
                 ) : (
                   <div className={styles.assignmentList}>
                     {category.items.map(item => {
+                      if (!item) return null;
                       const state = getAssignmentState(item);
+                      const daysUntilDue = daysUntilDate(item.dueDate);
                       return (
                         <Link
-                          key={item.id}
-                          className={styles.assignmentCard}
+                          key={item.id ?? `${category.key}-${item.title ?? 'assignment'}`}
+                          className={clsx(
+                            styles.assignmentCard,
+                            state === 'Closed' && styles.assignmentCardClosed,
+                          )}
                           to={item.link}
                           style={getDueCardStyle(item)}>
                           <div className={styles.assignmentTopRow}>
                             <span className={styles.assignmentType}>{item.kind}</span>
-                            <span
-                              className={clsx(
-                                styles.assignmentState,
-                                state === 'Current' && styles.stateCurrent,
-                                state === 'Upcoming' && styles.stateUpcoming,
-                                state === 'Closed' && styles.stateClosed,
-                              )}>
-                              {state}
-                            </span>
+                            <div className={styles.assignmentBadges}>
+                              <span
+                                className={clsx(
+                                  styles.assignmentState,
+                                  state === 'Current' && styles.stateCurrent,
+                                  state === 'Upcoming' && styles.stateUpcoming,
+                                  state === 'Closed' && styles.stateClosed,
+                                )}>
+                                {state}
+                              </span>
+                              <span className={styles.assignmentDueCountdown}>
+                                {formatDaysUntilDue(daysUntilDue)}
+                              </span>
+                            </div>
                           </div>
                           <Heading as="h4" className={styles.assignmentTitle}>
                             {item.title}

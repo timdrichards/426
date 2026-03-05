@@ -4,8 +4,6 @@ sidebar_position: 4
 
 # Lectures
 
-Use this page as the lecture index.
-
 ## Lecture List
 
 - [Lecture 06 - Compose and Service Decomposition](/docs/lectures/06)

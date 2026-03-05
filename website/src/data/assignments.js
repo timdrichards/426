@@ -1,8 +1,8 @@
-import categoryConfig from '@site/docs/assignments/categories.config.json';
-import assignmentWeights from '@site/docs/assignments/weights.json';
+import categoryConfig from '@site/docs/config/categories.config.json';
+import assignmentWeights from '@site/docs/config/weights.json';
 
-const WEIGHTS_FILE_PATH = 'website/docs/assignments/weights.json';
-const CATEGORY_CONFIG_PATH = 'website/docs/assignments/categories.config.json';
+const WEIGHTS_FILE_PATH = 'website/docs/config/weights.json';
+const CATEGORY_CONFIG_PATH = 'website/docs/config/categories.config.json';
 
 function startCase(value) {
   return value
@@ -46,51 +46,92 @@ function validateAssignmentWeights(weights) {
 }
 
 function getCategoryEntries() {
-  const context = require.context('@site/docs/assignments', true, /_category_\.json$/);
+  const configuredCategories = categoryConfig.categories ?? {};
 
-  return context
-    .keys()
-    .map(key => {
-      const parts = key.replace('./', '').split('/');
-      const categoryKey = parts[0];
-      const categoryData = context(key);
-      const category = categoryData.default ?? categoryData;
-
+  return Object.keys(assignmentWeights)
+    .map((categoryKey, index) => {
+      const category = configuredCategories[categoryKey] ?? {};
       return {
         key: categoryKey,
         label: category.label ?? startCase(categoryKey),
-        position: Number.isFinite(category.position) ? category.position : 999,
+        position: Number.isFinite(category.position) ? category.position : index + 1,
       };
     })
     .sort((a, b) => a.position - b.position || a.label.localeCompare(b.label));
 }
 
 function getAssignmentDocs() {
-  const context = require.context('@site/docs/assignments', true, /\.(md|mdx)$/);
+  const lectureContext = require.context('@site/docs/lectures', true, /\/(ex|ica)\/.*\.(md|mdx)$/);
+  const homeworkContext = require.context('@site/docs/homework', true, /\.(md|mdx)$/);
+  const lectureCategoryMap = {
+    ex: 'exercises',
+    ica: 'in-class-activities',
+  };
 
-  return context
+  const lectureDocs = lectureContext
     .keys()
-    .filter(key => {
-      const filePath = key.replace('./', '');
-      return filePath.includes('/') && !filePath.endsWith('/_category_.md') && !filePath.endsWith('/_category_.mdx');
-    })
+    .filter(key => key.replace('./', '').split('/').length === 3)
     .map(key => {
-      const module = context(key);
-      const frontMatter = module.frontMatter ?? {};
-      const parts = key.replace('./', '').split('/');
-      const categoryKey = parts[0];
-      const fileSlug = parts.join('/').replace(/\.(md|mdx)$/, '');
+    const module = lectureContext(key);
+    const frontMatter = module.frontMatter ?? {};
+    const parts = key.replace('./', '').split('/');
+    const lectureKey = parts[0];
+      const lectureSubdir = parts[1];
+    const categoryKey = frontMatter.assignmentType ?? lectureCategoryMap[lectureSubdir] ?? lectureSubdir;
+    const fileSlug = parts.join('/').replace(/\.(md|mdx)$/, '');
+    if (frontMatter.isAssignment !== true) return null;
 
+    return {
+      categoryKey,
+      id: frontMatter.id ?? frontMatter.slug ?? frontMatter.title ?? fileSlug,
+      title: frontMatter.title ?? `Lecture ${lectureKey} Assignment`,
+      releaseDate: frontMatter.releaseDate,
+      dueDate: frontMatter.dueDate,
+      dueDateTime: frontMatter.dueDateTime,
+      kind: frontMatter.kind,
+      lateDaysAllowed: frontMatter.lateDaysAllowed,
+      closeDate: frontMatter.closeDate,
+      link: frontMatter.slug ? `/docs${frontMatter.slug}` : `/docs/lectures/${fileSlug}`,
+      sourcePriority: 2,
+    };
+    })
+    .filter(Boolean);
+
+  const homeworkDocs = homeworkContext
+    .keys()
+    .map(key => {
+      const module = homeworkContext(key);
+      const frontMatter = module.frontMatter ?? {};
+      if (frontMatter.isAssignment !== true) return null;
+
+      const fileSlug = `homework/${key.replace('./', '').replace(/\.(md|mdx)$/, '')}`;
+      const categoryKey = frontMatter.assignmentType ?? 'homework';
       return {
         categoryKey,
         id: frontMatter.id ?? frontMatter.slug ?? frontMatter.title ?? fileSlug,
         title: frontMatter.title ?? 'Untitled Assignment',
         releaseDate: frontMatter.releaseDate,
         dueDate: frontMatter.dueDate,
+        dueDateTime: frontMatter.dueDateTime,
         kind: frontMatter.kind,
+        lateDaysAllowed: frontMatter.lateDaysAllowed,
+        closeDate: frontMatter.closeDate,
         link: frontMatter.slug ? `/docs${frontMatter.slug}` : `/docs/${fileSlug}`,
+        sourcePriority: 2,
       };
-    });
+    })
+    .filter(Boolean);
+
+  const docsByIdentity = new Map();
+  for (const item of [...lectureDocs, ...homeworkDocs]) {
+    const identity = `${item.categoryKey}::${item.id}`;
+    const previous = docsByIdentity.get(identity);
+    if (!previous || item.sourcePriority >= previous.sourcePriority) {
+      docsByIdentity.set(identity, item);
+    }
+  }
+
+  return [...docsByIdentity.values()].map(({sourcePriority, ...item}) => item);
 }
 
 validateAssignmentWeights(assignmentWeights);
@@ -137,6 +178,9 @@ export const assignmentCategories = [...discoveredCategoryKeys]
 const categoriesByKey = new Map(assignmentCategories.map(category => [category.key, category]));
 
 const assignments = assignmentDocs.map(item => {
+  if (!item || typeof item !== 'object') {
+    return null;
+  }
   const category = categoriesByKey.get(item.categoryKey);
 
   return {
@@ -146,8 +190,11 @@ const assignments = assignmentDocs.map(item => {
     kind: item.kind ?? category?.kind ?? 'Assignment',
     releaseDate: item.releaseDate,
     dueDate: item.dueDate,
+    dueDateTime: item.dueDateTime,
+    lateDaysAllowed: item.lateDaysAllowed,
+    closeDate: item.closeDate,
     link: item.link,
   };
-});
+}).filter(Boolean);
 
 export default assignments;

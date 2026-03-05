@@ -1,3 +1,15 @@
+---
+id: ica-10
+title: 'In-Class Activity 10'
+slug: /assignments/ica/ica-10
+releaseDate: '2026-03-05'
+dueDate: '2026-03-05'
+kind: In-Class Activity
+lateDaysAllowed: 0
+isAssignment: true
+assignmentType: in-class-activities
+---
+
 # 10 Idempotency Activity Starter
 
 This starter is for the idempotency activity.
