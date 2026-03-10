@@ -30,6 +30,7 @@ Generated website docs come from source folders under `../course/`:
 
 - lecture material: `../course/lectures/`
 - homework docs: `../course/assignments/homework/`
+- in-class activities: `../course/assignments/ica/`
 - readings: `../course/readings/`
 
 Key commands:

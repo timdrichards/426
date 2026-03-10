@@ -26,6 +26,7 @@ Before each site build, content is synced from `course/` into `website/docs/`.
 - sync lecture directories from `course/lectures/`
 - sync readings from `course/readings/`
 - sync homework docs from `course/assignments/homework/`
+- sync in-class activities from `course/assignments/ica/` into lecture doc locations
 
 ## Run the site locally
 

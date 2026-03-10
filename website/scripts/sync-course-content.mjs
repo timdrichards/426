@@ -9,6 +9,7 @@ const REPO_ROOT = path.resolve(WEBSITE_ROOT, "..");
 const SOURCE_ROOTS = {
   lectures: path.join(REPO_ROOT, "course", "lectures"),
   homework: path.join(REPO_ROOT, "course", "assignments", "homework"),
+  ica: path.join(REPO_ROOT, "course", "assignments", "ica"),
   readings: path.join(REPO_ROOT, "course", "readings"),
 };
 
@@ -95,8 +96,48 @@ async function syncHomework() {
   }
 }
 
+async function syncIca() {
+  const entries = await fs.readdir(SOURCE_ROOTS.ica, { withFileTypes: true });
+
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+
+    const lectureId = entry.name;
+    const sourceDir = path.join(SOURCE_ROOTS.ica, lectureId);
+    const lectureTarget = path.join(TARGET_ROOTS.lectures, lectureId);
+
+    const promptName = `ica-${lectureId}.md`;
+    const promptSource = path.join(sourceDir, promptName);
+    const promptTarget = path.join(lectureTarget, promptName);
+
+    try {
+      await fs.access(promptSource);
+      await copyFile(promptSource, promptTarget);
+    } catch {}
+
+    const targetDirName = lectureId === "09" ? "ica" : `ica-${lectureId}`;
+    const targetDir = path.join(lectureTarget, targetDirName);
+    await resetDir(targetDir);
+
+    const childEntries = await fs.readdir(sourceDir, { withFileTypes: true });
+    for (const child of childEntries) {
+      if (child.name === promptName) continue;
+
+      const childSource = path.join(sourceDir, child.name);
+      const childTarget = path.join(targetDir, child.name);
+
+      if (child.isDirectory()) {
+        await copyDirContents(childSource, childTarget);
+      } else if (child.isFile()) {
+        await copyFile(childSource, childTarget);
+      }
+    }
+  }
+}
+
 await syncLectures();
 await syncReadings();
 await syncHomework();
+await syncIca();
 
-console.log("[sync-course-content] synced lectures, readings, and homework into website/docs");
+console.log("[sync-course-content] synced lectures, readings, homework, and ICAs into website/docs");
