@@ -1,0 +1,62 @@
+name: decoupling-mini-1
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 2s
+      retries: 10
+
+  api-baseline:
+    build: ./api
+    environment:
+      - MODE=baseline
+      - PORT=3000
+      - WORK_SIM_MIN_MS=2000
+      - WORK_SIM_MAX_MS=4000
+      - WORK_SIM_FAIL_RATE=0.30
+    ports:
+      - "3000:3000"
+
+  api-relief:
+    build: ./api
+    environment:
+      - MODE=queued
+      - PORT=3000
+      - REDIS_URL=redis://redis:6379
+      - QUEUE_NAME=jobs
+    depends_on:
+      redis:
+        condition: service_healthy
+    ports:
+      - "3002:3000"
+
+  worker:
+    build: ./worker
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - QUEUE_NAME=jobs
+      - WORK_SIM_MIN_MS=2000
+      - WORK_SIM_MAX_MS=4000
+      - WORK_SIM_FAIL_RATE=0.15
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  demo:
+    build: ./demo-runner
+    profiles: ["tools"]
+    environment:
+      - BASELINE_URL=http://api-baseline:3000
+      - RELIEF_URL=http://api-relief:3000
+      - DEMO_TIMEOUT_SEC=20
+    depends_on:
+      api-baseline:
+        condition: service_started
+      api-relief:
+        condition: service_started
+    entrypoint: ["/runner/run.sh"]

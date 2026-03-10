@@ -1,0 +1,49 @@
+name: decoupling-09-activity2
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6383:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 2s
+      retries: 10
+
+  api:
+    build: ./api
+    environment:
+      - PORT=3000
+      - REDIS_URL=redis://redis:6379
+      - QUEUE_NAME=jobs
+      - PIPELINE=activity2
+    depends_on:
+      redis:
+        condition: service_healthy
+    ports:
+      - "3004:3000"
+
+  worker:
+    build: ./worker
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - QUEUE_NAME=jobs
+      - PIPELINE=activity2
+      - WORK_SIM_MIN_MS=300
+      - WORK_SIM_MAX_MS=900
+      - IDEM_TTL_SEC=86400
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  demo:
+    build: ./demo-runner
+    profiles: ["tools"]
+    environment:
+      - API_URL=http://api:3000
+      - DEMO_TIMEOUT_SEC=20
+    depends_on:
+      api:
+        condition: service_started
+    entrypoint: ["/runner/run.sh"]

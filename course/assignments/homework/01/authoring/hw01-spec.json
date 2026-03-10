@@ -1,0 +1,110 @@
+{
+  "course": "COMPSCI 426",
+  "assignment_title": "Homework 01: Reliable Campus Kiosk Simulation",
+  "assignment_id": "homework-01-reliable-campus-kiosk-simulation",
+  "archetype": "coding-implementation",
+  "difficulty": "intermediate",
+  "target_hours": 6.5,
+  "ai_policy_mode": "required-with-disclosure",
+  "delivery_mode": "individual",
+  "team_size": 1,
+  "due_date": "March 24, 2026 at 11:59 PM ET",
+  "assignment_brief": "Build a small queue-backed campus kiosk simulation that practices the exact distributed-systems ideas from recent class meetings. Your system should use an Express API, Redis, a worker container, Docker Compose, and server-rendered HTMX views. One HTMX view should act as a kiosk simulator where a user can place orders. A second HTMX view should act as a monitoring dashboard where a user can observe queued, processing, completed, and duplicate-handled orders. The central correctness requirement is idempotency: repeated submission of the same logical request must not create duplicate completed orders. This homework is meant to be a manageable individual rehearsal for the larger team simulation project later in the semester.",
+  "learning_objectives": [
+    "Containerize a small multi-service Node.js system with Docker and Docker Compose.",
+    "Use Redis both as a queue boundary and as shared state for job or order tracking.",
+    "Implement an Express API that accepts work quickly and separates request handling from background processing.",
+    "Build simple HTMX-driven interfaces for both order submission and simulation monitoring.",
+    "Apply idempotency so duplicate submissions do not create duplicate side effects.",
+    "Validate the system with reproducible commands, logs, and short engineering notes."
+  ],
+  "required_artifacts": [
+    {
+      "name": "Submission folder",
+      "type": "package",
+      "format": "directory",
+      "notes": "Submit one hw01/ folder containing brief.md, shots/, vids/, and code/."
+    },
+    {
+      "name": "brief.md",
+      "type": "writeup",
+      "format": "md",
+      "notes": "Main grading document with run instructions, architecture, idempotency explanation, AI Use Statement, and links to evidence."
+    },
+    {
+      "name": "shots/ and vids/",
+      "type": "evidence",
+      "format": "files",
+      "notes": "Only screenshots and videos linked from brief.md will be reviewed."
+    },
+    {
+      "name": "code/",
+      "type": "code",
+      "format": "directory",
+      "notes": "Full runnable implementation with api, worker, HTMX views, Dockerfiles, and compose file."
+    }
+  ],
+  "tasks": [
+    {
+      "title": "System scaffolding and container setup",
+      "estimated_hours": 1.0,
+      "description": "Create the api, worker, and Redis stack. Add Dockerfiles and a docker compose configuration that starts the full simulation with one command."
+    },
+    {
+      "title": "Express API, queue submission, and status routes",
+      "estimated_hours": 1.5,
+      "description": "Implement an Express API that accepts kiosk orders, validates input, assigns or records a stable request identifier, stores visible order state, and returns quickly instead of doing simulated work inline."
+    },
+    {
+      "title": "Worker processing and Redis-backed state",
+      "estimated_hours": 1.5,
+      "description": "Implement a worker container that consumes queued jobs from Redis, simulates fulfillment with a short delay, and updates per-order state so status can be observed later."
+    },
+    {
+      "title": "HTMX kiosk and monitoring views",
+      "estimated_hours": 1.3,
+      "description": "Build one HTMX-driven kiosk view for placing orders and one HTMX-driven monitoring view for observing order state and recent system activity."
+    },
+    {
+      "title": "Idempotency and verification",
+      "estimated_hours": 1.2,
+      "description": "Prevent duplicate submissions from causing duplicate completed effects. Demonstrate the behavior through the UI, status checks, and logs."
+    }
+  ],
+  "constraints": [
+    "Use Express for the HTTP API.",
+    "Use Redis as part of the running system, not only as an optional add-on.",
+    "Use Dockerfiles plus docker compose to run the full stack.",
+    "Build a basic server-rendered UI using HTMX.",
+    "Your API must expose POST /orders and GET /orders/:requestId.",
+    "Expose one kiosk simulator page and one monitoring page.",
+    "POST /orders must accept a stable request identifier from the client, such as requestId in JSON or an Idempotency-Key header.",
+    "A repeated logical request must return a non-error response and must not enqueue or complete duplicate work.",
+    "The worker must process queued orders asynchronously and simulate work with a small delay so the queue boundary is visible.",
+    "Store enough state in Redis to let graders verify queued, processing, completed, or duplicate-skipped behavior.",
+    "Use HTMX to submit new orders and to refresh at least part of the monitoring view without a full page reload.",
+    "Document exact commands for build, run, test, and cleanup."
+  ],
+  "submission_instructions": [
+    "Submit a zip file to Canvas by the deadline.",
+    "The zip file must contain one folder named hw01/ with brief.md, shots/, vids/, and code/.",
+    "Only screenshots and videos linked from brief.md will be reviewed.",
+    "brief.md must include run instructions, architecture notes, idempotency explanation, and an AI Use Statement.",
+    "Because this assignment spans UI, async processing, and container orchestration, AI use is expected and encouraged. Document how you used it and what you verified yourself."
+  ],
+  "grading_weights": {
+    "Containerization and compose setup": 15.0,
+    "API, Redis, and HTMX integration": 30.0,
+    "Idempotency correctness": 25.0,
+    "Validation and evidence quality": 20.0,
+    "Engineering brief quality": 10.0
+  },
+  "common_failure_modes": [
+    "Feature appears correct on happy path but fails on edge cases.",
+    "Tests exist but do not validate failure boundaries."
+  ],
+  "optional_extensions": [
+    "Add performance instrumentation and report bottlenecks.",
+    "Add one optional advanced feature with tests."
+  ]
+}
