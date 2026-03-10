@@ -7,7 +7,7 @@ releaseDate: '2026-03-05'
 dueDate: '2026-03-05'
 ---
 
-# In-Class Activity 10 - Idempotency
+# In-Class Activity 10 - Idempotency Incident Response
 
 ## Starter Code
 
@@ -15,137 +15,222 @@ dueDate: '2026-03-05'
 
 ## Overview
 
-This class focuses on correctness under duplicate delivery.
+Today you are the reliability team for a queue-based system that is misbehaving in production.
 
-You will complete one activity:
+The API is accepting requests correctly. The worker is processing jobs correctly. The problem is that retries and duplicate delivery are causing the same logical job to trigger the same side effect multiple times.
 
-1. **Activity**: make queue processing safe under duplicate delivery by adding idempotency.
+Your mission in class is to:
 
-Why this matters in real systems:
+1. reproduce the duplicate-side-effect bug,
+2. patch the worker with an idempotency guard,
+3. prove that one logical job now produces one side effect.
 
-- retries and at-least-once delivery are common in distributed systems
-- duplicate deliveries can duplicate business side effects (double email, double charge, etc.)
-- idempotency prevents repeated side effects for the same logical job
+This is not a “read and discuss” activity. You should leave class having changed code, run the system, and gathered evidence that your fix works.
 
-You will use Docker Compose and built-in demo runner containers, so you do **not** need `curl` installed locally.
+## Why This Is Interesting
 
-## Project Structure
+This activity simulates a very real distributed-systems failure mode:
 
-Lecture 10 code is organized under `website/code/10-idempotency`:
+- the queue uses at-least-once delivery,
+- retries are expected,
+- duplicate delivery is normal,
+- duplicate side effects are not acceptable.
 
-- `activity-2/`: starter for idempotency implementation
-- `mini-lecture-2/`: instructor demo stack (duplicates vs idempotency)
+Without idempotency, one user action can become two emails, two shipments, or two charges. Your job is to stop that from happening.
 
-For this assignment, focus on:
+## What You Are Working With
 
-- `website/code/10-idempotency/activity-2`
+Use the code in:
 
-## Testing Scripts (Container-Based)
+- `website/docs/lectures/10/code/activity-2`
 
-Activity includes a `demo` service in `compose.yml` that runs testing scripts from inside a container.
+Important pieces:
 
-General pattern:
+- `api/`
+  - accepts requests and enqueues jobs
+- `worker/worker.js`
+  - consumes jobs and currently has the missing idempotency logic
+- `demo-runner/run.sh`
+  - provides containerized commands that generate duplicates and summarize the results
+- `compose.yml`
+  - starts Redis, API, worker, and the demo runner
+
+## Class Scenario
+
+Assume the product team filed this bug:
+
+> “When the same job is retried, the system appears to apply the side effect multiple times. We need safe retries before this design can go to production.”
+
+You are not rewriting the architecture. You are fixing the worker so retries become safe.
+
+## Activity Flow
+
+Work in pairs unless your instructor says otherwise.
+
+Suggested timeline:
+
+1. 5 minutes: start the stack and observe the bug
+2. 10 minutes: implement the idempotency guard
+3. 10 minutes: test and compare before/after behavior
+4. 5 minutes: capture proof and be ready to explain your design
+
+## Before You Start
+
+From the repository root:
 
 ```bash
-docker compose run --rm demo <command>
+cd website/docs/lectures/10/code/activity-2
+docker compose up --build -d
 ```
 
-### Demo commands
+If the stack starts correctly, you should have:
 
-Run from `website/code/10-idempotency/activity-2`:
+- a Redis container,
+- an API container,
+- a worker container.
 
-- `duplicate-observe [job_id] [submissions]`
-  - submits same `jobId` multiple times, then shows attempts/effects
-- `duplicate-load [unique_jobs] [duplicates_per_job]`
-  - sends duplicates in bulk, summarizes total side effects
-- `poll-job <job_id>`
-  - inspect one job/effect summary
-- `help`
-  - prints command usage
+## Phase 1 - Reproduce the Bug
 
-## Activity - Idempotency Under Duplicate Delivery
+Your first job is to see the failure clearly.
 
-### Goal
-
-Add idempotency to queue processing so repeated delivery of same `jobId` does not duplicate side effects.
-
-### Starter behavior
-
-In starter code, worker processes duplicates multiple times by default (idempotency not implemented).
-
-### Step 0: Start and observe duplicate problem
+Run:
 
 ```bash
-cd website/code/10-idempotency/activity-2
-docker compose up --build -d
 docker compose run --rm demo duplicate-observe
 docker compose run --rm demo duplicate-load 8 2
 ```
 
-Interpretation:
+What these commands do:
 
-- before idempotency, `observed_effects_total` should be near total submissions
-- duplicate deliveries cause duplicate side effects
+- `duplicate-observe`
+  - submits the same `jobId` multiple times and shows one job’s attempts and effects
+- `duplicate-load 8 2`
+  - creates 8 unique jobs and submits each one twice
 
-### Step 1: Implement idempotency guard in worker
+What you should notice before the fix:
 
-Edit `worker/worker.js` (TODO section).
+- the worker processes the same logical job more than once,
+- `observed_effects_total` is close to total submissions,
+- duplicate delivery is causing duplicate side effects.
 
-Implement logic like:
+This is your baseline. Do not skip it. You need a clear before/after comparison.
 
-1. build idempotency key from `jobId` (for example `processed:<pipeline>:<jobId>`)
-2. claim once using Redis `SET key 1 NX EX <ttl>`
-3. if claim fails:
-   - skip side effect execution
-   - log duplicate skip
-   - update job status/counters appropriately
-4. if claim succeeds:
-   - run side effect
-   - mark completion
+## Phase 2 - Find the Right Place to Fix It
 
-### Step 2: Re-test duplicate scenarios
+Open:
+
+- `website/docs/lectures/10/code/activity-2/worker/worker.js`
+
+Read `processJob(job)` carefully.
+
+Notice the current behavior:
+
+- the worker marks the job as processing,
+- it increments process attempts,
+- it always applies the side effect,
+- it labels idempotency as `not-implemented`.
+
+There is already a TODO comment showing the intended direction. Your job is to turn that into working logic.
+
+## Phase 3 - Implement the Guard
+
+Add idempotency to the worker so repeated delivery of the same `jobId` does not repeat the side effect.
+
+Your implementation must do all of the following:
+
+1. build a stable idempotency key from `jobId`
+2. use Redis `SET ... NX EX ...` to claim the job once
+3. skip the side effect if the claim fails
+4. log that a duplicate delivery was skipped
+5. update Redis job metadata so the job state reflects what happened
+
+Recommended key pattern:
+
+```txt
+processed:<pipeline>:<jobId>
+```
+
+Recommended Redis operation:
+
+```js
+await client.set(processedKey(job.jobId), '1', { NX: true, EX: ttlSec })
+```
+
+### Your Design Goal
+
+After your change:
+
+- the first delivery of a `jobId` should apply the side effect,
+- later duplicate deliveries of the same `jobId` should not apply it again.
+
+### Important Constraint
+
+The claim must happen before the side effect runs.
+
+If you apply the side effect first and only record completion afterward, you have not fixed the duplicate-delivery problem.
+
+## Phase 4 - Test Like an Engineer
+
+After editing `worker/worker.js`, rebuild and rerun:
 
 ```bash
 docker compose up --build -d
 docker compose run --rm demo duplicate-observe
 docker compose run --rm demo duplicate-load 8 2
-docker compose logs -f worker
+docker compose logs --tail=100 worker
 ```
 
-Expected after idempotency:
+What success looks like:
 
-- one side effect per unique `jobId`
-- repeated submissions are skipped, not re-executed
-- in load test, `observed_effects_total` should trend toward `unique_jobs`
+- one unique `jobId` produces one side effect,
+- duplicate attempts are still visible as processing attempts,
+- duplicate deliveries are skipped,
+- `observed_effects_total` trends toward `unique_jobs`, not total submissions.
 
-### Step 3: Optional Redis verification
+## Optional Deep Check
+
+If you want to inspect the guard state directly:
 
 ```bash
-docker compose exec redis redis-cli
-KEYS 'processed:*'
+docker compose exec redis redis-cli KEYS 'processed:*'
 ```
 
-### Success criteria
+This helps verify that Redis is storing idempotency claims.
 
-You are done when:
+## Victory Conditions
 
-- duplicate submissions of same `jobId` do not repeat side effects
-- worker logs clearly show duplicate-skip events
-- load test output demonstrates reduced side-effect count compared to baseline
+You are done when you can demonstrate all of the following:
 
-## Deliverables
+1. the worker no longer repeats the side effect for the same `jobId`
+2. the worker logs show duplicate-skip behavior
+3. your before/after test results clearly show the improvement
+4. you can explain why `SET NX` solves the duplicate-delivery problem here
 
-Submit all of the following:
+## What To Turn In
 
-1. **Idempotency evidence**
-   - `duplicate-observe` output before and after idempotency (or equivalent proof)
-   - `duplicate-load` output demonstrating reduction in side-effect count
-   - worker log snippet showing duplicate-skip behavior
+Submit evidence from class that shows your fix worked.
+
+Include:
+
+1. a short note describing your idempotency strategy
+2. output from `duplicate-observe` before the fix
+3. output from `duplicate-observe` after the fix
+4. output from `duplicate-load 8 2` after the fix
+5. a worker log snippet showing duplicate deliveries being skipped
+
+## Fast Finishers
+
+If you finish early, push the design a little further:
+
+1. Explain what could go wrong if the TTL is too short.
+2. Explain why `jobId` works as an idempotency key but a delivery-specific ID would not.
+3. Change the duplicate test to use more submissions and predict the result before running it.
+4. Identify what additional data you would log in production for debugging or dashboards.
 
 ## Cleanup
 
-When finished:
+When class ends:
 
 ```bash
-cd website/code/10-idempotency/activity-2 && docker compose down
+docker compose down
 ```

@@ -7,12 +7,12 @@ const port = Number(process.env.PORT || '3000')
 
 const redisUrl = process.env.REDIS_URL || 'redis://redis:6379'
 const queueName = process.env.QUEUE_NAME || 'jobs'
-const pipeline = process.env.PIPELINE || 'activity2'
+const pipeline = process.env.PIPELINE || 'ica-10'
 const ttlSec = Number(process.env.TTL_SEC || '86400')
 
 const client = redis.createClient({ url: redisUrl })
 
-client.on('error', (err) => {
+client.on('error', err => {
   console.error('Redis error:', err.message)
 })
 
@@ -41,10 +41,11 @@ app.get('/healthz', async (_req, res) => {
 
 app.get('/', (_req, res) => {
   res.json({
-    service: 'activity-2-api',
+    service: 'ica-10-api',
     pipeline,
     queueName,
-    message: 'POST /tasks enqueues jobs. Worker currently has no idempotency guard.',
+    message:
+      'POST /tasks enqueues jobs. Worker currently has no idempotency guard.',
   })
 })
 
@@ -78,16 +79,18 @@ app.post('/tasks', async (req, res) => {
   await client.lPush(queueName, JSON.stringify(job))
   const queueDepth = await client.lLen(queueName)
 
-  res.status(202).json({
-    accepted: true,
-    pipeline,
-    queueName,
-    jobId,
-    enqueueCount,
-    queueDepth,
-    statusUrl: `/jobs/${jobId}`,
-    effectsUrl: `/effects/${jobId}`,
-  })
+  res
+    .status(202)
+    .json({
+      accepted: true,
+      pipeline,
+      queueName,
+      jobId,
+      enqueueCount,
+      queueDepth,
+      statusUrl: `/jobs/${jobId}`,
+      effectsUrl: `/effects/${jobId}`,
+    })
 })
 
 app.get('/jobs/:jobId', async (req, res) => {
@@ -107,16 +110,13 @@ app.get('/effects/:jobId', async (req, res) => {
   const effectCount = Number((await client.get(effectKey(jobId))) || '0')
   const enqueueCount = Number((await client.get(enqueueCountKey(jobId))) || '0')
 
-  res.json({
-    jobId,
-    pipeline,
-    effectCount,
-    enqueueCount,
-  })
+  res.json({ jobId, pipeline, effectCount, enqueueCount })
 })
 
 await client.connect()
 
 app.listen(port, () => {
-  console.log(`API listening on port ${port} pipeline=${pipeline} queue=${queueName}`)
+  console.log(
+    `API listening on port ${port} pipeline=${pipeline} queue=${queueName}`,
+  )
 })

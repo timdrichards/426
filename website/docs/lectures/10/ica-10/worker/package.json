@@ -1,7 +1,7 @@
 {
-  "name": "activity-2-worker",
+  "name": "ica-10-worker",
   "version": "1.0.0",
-  "description": "Activity 2 worker starter",
+  "description": "ICA 10 worker starter",
   "type": "module",
   "main": "worker.js",
   "scripts": {

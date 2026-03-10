@@ -1,7 +1,7 @@
 {
-  "name": "activity-2-api",
+  "name": "ica-10-api",
   "version": "1.0.0",
-  "description": "Activity 2 API starter",
+  "description": "ICA 10 API starter",
   "type": "module",
   "main": "server.js",
   "scripts": {

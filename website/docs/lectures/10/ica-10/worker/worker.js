@@ -2,18 +2,18 @@ import redis from 'redis'
 
 const redisUrl = process.env.REDIS_URL || 'redis://redis:6379'
 const queueName = process.env.QUEUE_NAME || 'jobs'
-const pipeline = process.env.PIPELINE || 'activity2'
+const pipeline = process.env.PIPELINE || 'ica-10'
 const minMs = Number(process.env.WORK_SIM_MIN_MS || '300')
 const maxMs = Number(process.env.WORK_SIM_MAX_MS || '900')
 const ttlSec = Number(process.env.IDEM_TTL_SEC || '86400')
 
 const client = redis.createClient({ url: redisUrl })
 
-client.on('error', (err) => {
+client.on('error', err => {
   console.error('Worker Redis error:', err.message)
 })
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 function randomDelayMs(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min
@@ -53,7 +53,7 @@ async function processJob(job) {
   await client.expire(jobKey(job.jobId), ttlSec)
 
   /*
-    Activity 2 TODO:
+    In-Class Activity TODO:
     1) Add idempotency claim with SET NX, for example:
          const claimed = await client.set(processedKey(job.jobId), '1', { NX: true, EX: ttlSec })
     2) If not claimed, skip side effect and log duplicate skip.
@@ -71,7 +71,9 @@ async function processJob(job) {
     idempotency: 'not-implemented',
   })
 
-  console.log(`job=${job.jobId} status=done effectCount=${effectCount} delayMs=${delayMs}`)
+  console.log(
+    `job=${job.jobId} status=done effectCount=${effectCount} delayMs=${delayMs}`,
+  )
 }
 
 async function loop() {
