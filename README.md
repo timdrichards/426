@@ -5,7 +5,7 @@ This repository contains course source materials plus the Docusaurus site used t
 ## Repo layout
 
 - `course/`: source-of-truth authored course material
-  - `course/lectures/`: lecture units with slides, code, and lecture assets
+  - `course/lectures/`: topic-slugged lecture units with slides, code, and lecture assets
   - `course/assignments/`: homework, in-class activities, exercises, and project material
   - `course/readings/`: reading chapters and reading assets
   - `course/weeks/`: week overview and schedule-linked pages

@@ -57,10 +57,31 @@ async function syncLectures() {
   const entries = await fs.readdir(SOURCE_ROOTS.lectures, { withFileTypes: true });
   for (const entry of entries) {
     if (!entry.isDirectory()) continue;
-    await copyDirContents(
-      path.join(SOURCE_ROOTS.lectures, entry.name),
-      path.join(TARGET_ROOTS.lectures, entry.name),
-    );
+    const match = entry.name.match(/^(\d{2})/);
+    if (!match) continue;
+    const lectureId = match[1];
+    const sourceDir = path.join(SOURCE_ROOTS.lectures, entry.name);
+    const targetDir = path.join(TARGET_ROOTS.lectures, lectureId);
+    await ensureDir(targetDir);
+
+    const childEntries = await fs.readdir(sourceDir, { withFileTypes: true });
+    for (const child of childEntries) {
+      const childSource = path.join(sourceDir, child.name);
+
+      if (child.isDirectory()) {
+        await copyDirContents(childSource, path.join(targetDir, child.name));
+        continue;
+      }
+
+      if (!child.isFile()) continue;
+
+      if (child.name === "lecture.md") {
+        await copyFile(childSource, path.join(targetDir, `${lectureId}.md`));
+        continue;
+      }
+
+      await copyFile(childSource, path.join(targetDir, child.name));
+    }
   }
 }
 
