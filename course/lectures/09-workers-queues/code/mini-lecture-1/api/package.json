@@ -1,0 +1,14 @@
+{
+  "name": "mini-lecture-api",
+  "version": "1.0.0",
+  "description": "Baseline and queued API for decoupling mini-lecture",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "redis": "^5.8.2"
+  }
+}

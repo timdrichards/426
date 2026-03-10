@@ -1,15 +1,3 @@
----
-id: ica-09
-title: 'In-Class Activity 09'
-slug: /assignments/ica/ica-09
-releaseDate: '2026-03-03'
-dueDate: '2026-03-03'
-kind: In-Class Activity
-lateDaysAllowed: 0
-isAssignment: true
-assignmentType: in-class-activities
----
-
 # 09 Decoupling Activity 1 Starter
 
 This starter matches the `website/docs/lectures/09/slides` hands-on activities.
@@ -54,14 +42,6 @@ After implementing queue mode, compare with:
 docker compose run --rm demo queue-observe
 docker compose run --rm demo queue-load 12 6
 ```
-
-## Activity 2 target
-
-Add idempotency guard in worker:
-
-- stable key (`jobId`)
-- claim once via Redis `SET NX`
-- duplicate jobs are safely skipped
 
 ## Failure isolation demo
 

@@ -1,0 +1,45 @@
+name: decoupling-09
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 2s
+      retries: 10
+
+  api:
+    build: ./api
+    ports:
+      - "3000:3000"
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - WORK_SIM_MIN_MS=2000
+      - WORK_SIM_MAX_MS=4000
+      - WORK_SIM_FAIL_RATE=0.30
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  worker:
+    build: ./worker
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - HEARTBEAT_MS=15000
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  demo:
+    build: ./demo-runner
+    profiles: ["tools"]
+    environment:
+      - API_URL=http://api:3000
+      - DEMO_TIMEOUT_SEC=20
+    depends_on:
+      api:
+        condition: service_started
+    entrypoint: ["/runner/run.sh"]

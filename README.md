@@ -1,12 +1,32 @@
 # 426 Repository
 
-This repository contains course materials and a Docusaurus site used to publish course documentation to GitHub Pages.
+This repository contains course source materials plus the Docusaurus site used to publish them to GitHub Pages.
 
 ## Repo layout
 
-- `website/`: source of truth for published docs and assets (edit here first)
-- `lectures/`: legacy/archival lecture content
+- `course/`: source-of-truth authored course material
+  - `course/lectures/`: topic-slugged lecture units with slides, code, and lecture assets
+  - `course/assignments/`: homework, in-class activities, exercises, and project material
+  - `course/readings/`: reading chapters and reading assets
+  - `course/weeks/`: week overview and schedule-linked pages
+  - `course/shared/`: reusable templates and shared assets
+- `website/`: Docusaurus publish target
+- `syllabus/`: syllabus and schedule artifacts
+- `archive/`: older or legacy course material
 - `.github/workflows/`: automation, including GitHub Pages deployment
+
+## Build flow
+
+The website is now a generated destination rather than the main authoring home.
+
+Before each site build, content is synced from `course/` into `website/docs/`.
+
+`cd website && npm run sync:content` performs the current sync pass:
+
+- sync lecture directories from `course/lectures/`
+- sync readings from `course/readings/`
+- sync homework docs from `course/assignments/homework/`
+- sync in-class activities from `course/assignments/ica/` into lecture doc locations
 
 ## Run the site locally
 
@@ -20,20 +40,6 @@ Docusaurus will print a local URL (typically `http://localhost:3000/426/` for th
 
 ```bash
 npm run website:build
-```
-
-## Publish Workflow
-
-Default publish is website-first and does not copy/sync from lecture content folders under `website/docs/lectures/*`:
-
-```bash
-npm run publish:website
-```
-
-If you explicitly want the old sync/copy behavior:
-
-```bash
-npm run publish:legacy-sync
 ```
 
 ## Deployment

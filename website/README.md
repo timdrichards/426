@@ -5,37 +5,43 @@ This website is built using [Docusaurus](https://docusaurus.io/), a modern stati
 ## Installation
 
 ```bash
-yarn
+npm install
 ```
 
 ## Local Development
 
 ```bash
-yarn start
+npm start
 ```
 
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
+This command syncs course content from `../course/` into `docs/`, then starts a local development server.
 
 ## Build
 
 ```bash
-yarn build
+npm run build
 ```
 
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
+This command syncs course content, then generates static content into the `build` directory.
+
+## Content preparation
+
+Generated website docs come from source folders under `../course/`:
+
+- lecture material: `../course/lectures/`
+- homework docs: `../course/assignments/homework/`
+- in-class activities: `../course/assignments/ica/`
+- readings: `../course/readings/`
+
+Key commands:
+
+- Run content sync: `npm run sync:content`
+- Prepare content before local dev/build: `npm run prepare:content`
 
 ## Deployment
 
-Using SSH:
-
 ```bash
-USE_SSH=true yarn deploy
+npm run deploy
 ```
 
-Not using SSH:
-
-```bash
-GIT_USER=<Your GitHub username> yarn deploy
-```
-
-If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
+`deploy` also runs the content sync step before publishing.

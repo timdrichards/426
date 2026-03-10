@@ -1,0 +1,36 @@
+name: resilience-08
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 2s
+      retries: 10
+
+  api:
+    build: ./api
+    ports:
+      - "3000:3000"
+    environment:
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/readyz"]
+      interval: 5s
+      timeout: 2s
+      retries: 10
+      start_period: 10s
+
+  web:
+    build: ./web
+    ports:
+      - "3001:3001"
+    depends_on:
+      api:
+        condition: service_healthy
