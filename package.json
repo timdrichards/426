@@ -7,6 +7,7 @@
     "publish:legacy-sync": "./scripts/publish-website.sh --legacy-sync",
     "build:all": "./scripts/build-all.sh",
     "generate:assignments-doc": "node ./scripts/generate-assignments-doc.js",
+    "watch:site": "npm --prefix website run watch:site --",
     "website:dev": "cd website && npm start",
     "website:build": "node ./scripts/generate-assignments-doc.js && cd website && npm run build",
     "sync:assignments": "./scripts/sync-assignments.sh",

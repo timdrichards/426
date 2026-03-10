@@ -60,10 +60,12 @@ const config = {
             '**/_*.mdx',
             '**/node_modules/**',
             '**/dist/**',
+            '**/.docusaurus/**',
+            '**/build/**',
             '**/.slidev/**',
-            '**/lectures/*/code/**',
-            '**/lectures/*/slides/**',
-            '**/lectures/*/img/**',
+            '**/code/**',
+            '**/slides/**',
+            '**/img/**',
           ],
         },
         blog: false,
@@ -75,12 +77,15 @@ const config = {
   ],
   plugins: [
     function ignoreGeneratedWatchPaths() {
+      const ignoredWatchPathPattern =
+        /(^|[\\/])(\.git|\.docusaurus|node_modules|dist|\.slidev|build|archive)([\\/]|$)|(^|[\\/])website[\\/]docs[\\/].*([\\/])(code|slides|img)([\\/]|$)/;
+
       return {
         name: 'ignore-generated-watch-paths',
         configureWebpack() {
           return {
             watchOptions: {
-              ignored: /(^|[\\/])(node_modules|dist|\.slidev)([\\/]|$)/,
+              ignored: ignoredWatchPathPattern,
             },
           };
         },
