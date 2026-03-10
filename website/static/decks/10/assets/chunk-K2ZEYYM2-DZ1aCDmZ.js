@@ -1,0 +1,1 @@
+import{d as i}from"./two-cols.vue_vue_type_script_setup_true_lang-CJDLXhDB.js";function t(c,e){c.accDescr&&e.setAccDescription?.(c.accDescr),c.accTitle&&e.setAccTitle?.(c.accTitle),c.title&&e.setDiagramTitle?.(c.title)}i(t,"populateCommonDb");export{t as p};
