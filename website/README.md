@@ -14,7 +14,9 @@ npm install
 npm start
 ```
 
-This command syncs course content from `../course/` into `docs/`, then starts a local development server.
+This command performs an initial sync from `../course/` into `docs/`, keeps watching the source folders for changes, and starts the local development server.
+
+When you edit supported source content under `../course/`, the sync script copies updates into `docs/` and Docusaurus can hot-reload the changed pages in the browser.
 
 ## Build
 

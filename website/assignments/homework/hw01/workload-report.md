@@ -15,7 +15,7 @@
 | System scaffolding and container setup | 0.9 | 0.8 |
 | Express API, queue submission, and status routes | 1.4 | 1.3 |
 | Worker processing and Redis-backed state | 1.4 | 1.3 |
-| HTMX kiosk and monitoring views | 1.2 | 1.1 |
+| HTML kiosk and monitoring views | 1.2 | 1.1 |
 | Idempotency and verification | 1.6 | 2.0 |
 
 ## Recommendations

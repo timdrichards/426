@@ -6,7 +6,7 @@
     "sync:content": "node scripts/sync-course-content.mjs",
     "prepare:content": "npm run sync:content",
     "docusaurus": "docusaurus",
-    "start": "npm run prepare:content && WATCHPACK_POLLING=true docusaurus start",
+    "start": "node scripts/dev-course-content.mjs",
     "build": "npm run prepare:content && docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "npm run prepare:content && docusaurus deploy",

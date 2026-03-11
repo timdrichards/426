@@ -9,12 +9,12 @@
   "delivery_mode": "individual",
   "team_size": 1,
   "due_date": "March 24, 2026 at 11:59 PM ET",
-  "assignment_brief": "Build a small queue-backed campus kiosk simulation that practices the exact distributed-systems ideas from recent class meetings. Your system should use an Express API, Redis, a worker container, Docker Compose, and server-rendered HTMX views. One HTMX view should act as a kiosk simulator where a user can place orders. A second HTMX view should act as a monitoring dashboard where a user can observe queued, processing, completed, and duplicate-handled orders. The central correctness requirement is idempotency: repeated submission of the same logical request must not create duplicate completed orders. This homework is meant to be a manageable individual rehearsal for the larger team simulation project later in the semester.",
+  "assignment_brief": "Build a small queue-backed campus kiosk simulation that practices the exact distributed-systems ideas from recent class meetings. Your system should use an Express API, Redis, a worker container, Docker Compose, and simple server-rendered HTML views. One HTML view should act as a kiosk simulator where a user can place orders. A second HTML view should act as a monitoring dashboard where a user can observe queued, processing, completed, and duplicate-handled orders. The central correctness requirement is idempotency: repeated submission of the same logical request must not create duplicate completed orders. This homework is meant to be a manageable individual rehearsal for the larger team simulation project later in the semester.",
   "learning_objectives": [
     "Containerize a small multi-service Node.js system with Docker and Docker Compose.",
     "Use Redis both as a queue boundary and as shared state for job or order tracking.",
     "Implement an Express API that accepts work quickly and separates request handling from background processing.",
-    "Build simple HTMX-driven interfaces for both order submission and simulation monitoring.",
+    "Build simple HTML interfaces for both order submission and simulation monitoring.",
     "Apply idempotency so duplicate submissions do not create duplicate side effects.",
     "Validate the system with reproducible commands, logs, and short engineering notes."
   ],
@@ -41,7 +41,7 @@
       "name": "code/",
       "type": "code",
       "format": "directory",
-      "notes": "Full runnable implementation with api, worker, HTMX views, Dockerfiles, and compose file."
+      "notes": "Full runnable implementation with api, worker, HTML views, Dockerfiles, and compose file."
     }
   ],
   "tasks": [
@@ -61,9 +61,9 @@
       "description": "Implement a worker container that consumes queued jobs from Redis, simulates fulfillment with a short delay, and updates per-order state so status can be observed later."
     },
     {
-      "title": "HTMX kiosk and monitoring views",
+      "title": "HTML kiosk and monitoring views",
       "estimated_hours": 1.2,
-      "description": "Build one HTMX-driven kiosk view for placing orders and one HTMX-driven monitoring view for observing order state and recent system activity."
+      "description": "Build one plain HTML kiosk view for placing orders and one plain HTML monitoring view for observing order state and recent system activity."
     },
     {
       "title": "Idempotency and verification",
@@ -75,14 +75,14 @@
     "Use Express for the HTTP API.",
     "Use Redis as part of the running system, not only as an optional add-on.",
     "Use Dockerfiles plus docker compose to run the full stack.",
-    "Build a basic server-rendered UI using HTMX.",
+    "Build a basic server-rendered UI using plain HTML.",
     "Your API must expose POST /orders and GET /orders/:requestId.",
     "Expose one kiosk simulator page and one monitoring page.",
     "POST /orders must accept a stable request identifier from the client, such as requestId in JSON or an Idempotency-Key header.",
     "A repeated logical request must return a non-error response and must not enqueue or complete duplicate work.",
     "The worker must process queued orders asynchronously and simulate work with a small delay so the queue boundary is visible.",
     "Store enough state in Redis to let graders verify queued, processing, completed, or duplicate-skipped behavior.",
-    "Use HTMX to submit new orders and to refresh at least part of the monitoring view without a full page reload.",
+    "Use plain HTML form handling for new orders, and make the monitoring view easy to refresh or revisit to observe state changes.",
     "Document exact commands for build, run, test, and cleanup."
   ],
   "submission_instructions": [
@@ -94,7 +94,7 @@
   ],
   "grading_weights": {
     "Containerization and compose setup": 15.0,
-    "API, Redis, and HTMX integration": 30.0,
+    "API, Redis, and HTML integration": 30.0,
     "Idempotency correctness": 25.0,
     "Validation and evidence quality": 20.0,
     "Engineering brief quality": 10.0

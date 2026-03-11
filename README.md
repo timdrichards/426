@@ -36,6 +36,13 @@ npm run website:dev
 
 Docusaurus will print a local URL (typically `http://localhost:3000/426/` for this repo setup).
 
+This local dev command now does two things together:
+
+- watches source content under `course/`
+- re-syncs changed content into `website/docs/`
+
+That means edits in `course/lectures/`, `course/assignments/`, and `course/readings/` should flow into the site automatically while Docusaurus is running, so the browser can refresh against the updated generated docs.
+
 ## Build the site locally
 
 ```bash

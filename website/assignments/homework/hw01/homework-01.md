@@ -11,9 +11,9 @@ dueDate: '2026-03-24'
 
 ## Reliable Campus Kiosk Simulation
 
-Build a small queue-backed simulation using Express, HTMX, Redis, Docker, and Docker Compose.
+Build a small queue-backed simulation using Express, simple HTML, Redis, Docker, and Docker Compose.
 
-Users submit kiosk orders through an HTMX-powered kiosk page. The API should respond quickly and enqueue work. A worker container processes those orders asynchronously. A second HTMX-powered monitoring page should show the simulation state. The key requirement is idempotency: if the same logical order is submitted more than once, your system must not create duplicate completed work.
+Users submit kiosk orders through a plain HTML kiosk page. The API should respond quickly and enqueue work. A worker container processes those orders asynchronously. A second plain HTML monitoring page should show the simulation state. The key requirement is idempotency: if the same logical order is submitted more than once, your system must not create duplicate completed work.
 
 This assignment is designed to be hands-on and visual. When it works, you should be able to place an order, watch the monitor update, and explain why duplicate retries are safe.
 
@@ -22,8 +22,8 @@ This assignment is designed to be hands-on and visual. When it works, you should
 - `api` container using Express
 - `worker` container for asynchronous processing
 - `redis` container for queue and shared state
-- kiosk simulator page using HTMX
-- monitoring page using HTMX
+- kiosk simulator page using plain HTML
+- monitoring page using plain HTML
 - `docker compose up --build` workflow
 - `POST /orders`
 - `GET /orders/:requestId`
@@ -32,7 +32,7 @@ This assignment is designed to be hands-on and visual. When it works, you should
 
 - first-time requests are accepted and queued
 - order state is visible through Redis-backed status data
-- kiosk and monitor interactions use HTMX
+- kiosk and monitor interactions use plain HTML
 - duplicate logical requests return a non-error response
 - duplicate logical requests do not create duplicate fulfilled orders
 

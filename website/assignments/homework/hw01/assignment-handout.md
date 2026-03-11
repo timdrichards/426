@@ -14,14 +14,14 @@
 - Containerize a small multi-service Node.js system with Docker and Docker Compose.
 - Use Redis both as a queue boundary and as shared state for job or order tracking.
 - Implement an Express API that accepts work quickly and separates request handling from background processing.
-- Build simple HTMX-driven interfaces for both order submission and simulation monitoring.
+- Build simple HTML interfaces for both order submission and simulation monitoring.
 - Apply idempotency so duplicate submissions do not create duplicate side effects.
 - Validate the system with reproducible commands, logs, and short engineering notes.
 
 ## Key Learning Outcomes
 
 - Build and run a small multi-container web system with Docker and Docker Compose.
-- Create an Express application that serves both API routes and server-rendered HTMX pages.
+- Create an Express application that serves both API routes and simple server-rendered HTML pages.
 - Use Redis for queueing work and storing shared system state.
 - Separate fast request handling from slower background work with a worker process.
 - Design a simple monitoring view that makes system behavior easy to observe.
@@ -30,7 +30,7 @@
 
 ## Assignment Brief
 
-Build a small queue-backed campus kiosk simulation that practices the exact distributed-systems ideas from recent class meetings. Your system should use an Express API, Redis, a worker container, Docker Compose, and server-rendered HTMX views. One HTMX view should act as a kiosk simulator where a user can place orders. A second HTMX view should act as a monitoring dashboard where a user can observe queued, processing, completed, and duplicate-handled orders. The central correctness requirement is idempotency: repeated submission of the same logical request must not create duplicate completed orders. This homework is meant to be a manageable individual rehearsal for the larger team simulation project later in the semester.
+Build a small queue-backed campus kiosk simulation that practices the exact distributed-systems ideas from recent class meetings. Your system should use an Express API, Redis, a worker container, Docker Compose, and simple server-rendered HTML views. One HTML view should act as a kiosk simulator where a user can place orders. A second HTML view should act as a monitoring dashboard where a user can observe queued, processing, completed, and duplicate-handled orders. The central correctness requirement is idempotency: repeated submission of the same logical request must not create duplicate completed orders. This homework is meant to be a manageable individual rehearsal for the larger team simulation project later in the semester.
 
 ## Required Artifacts
 
@@ -39,7 +39,7 @@ Build a small queue-backed campus kiosk simulation that practices the exact dist
 | Submission folder | package | directory | Submit one hw01/ folder containing brief.md, shots/, vids/, and code/. |
 | brief.md | writeup | md | Main grading document with run instructions, architecture, idempotency explanation, AI Use Statement, and links to evidence. |
 | shots/ and vids/ | evidence | files | Only screenshots and videos linked from brief.md will be reviewed. |
-| code/ | code | directory | Full runnable implementation with api, worker, HTMX views, Dockerfiles, and compose file. |
+| code/ | code | directory | Full runnable implementation with api, worker, HTML views, Dockerfiles, and compose file. |
 
 ## Task Plan
 
@@ -52,8 +52,8 @@ Implement an Express API that accepts kiosk orders, validates input, assigns or 
 ### Task 3: Worker processing and Redis-backed state (1.4h)
 Implement a worker container that consumes queued jobs from Redis, simulates fulfillment with a short delay, and updates per-order state so status can be observed later.
 
-### Task 4: HTMX kiosk and monitoring views (1.2h)
-Build one HTMX-driven kiosk view for placing orders and one HTMX-driven monitoring view for observing order state and recent system activity.
+### Task 4: HTML kiosk and monitoring views (1.2h)
+Build one plain HTML kiosk view for placing orders and one plain HTML monitoring view for observing order state and recent system activity.
 
 ### Task 5: Idempotency and verification (1.6h)
 Prevent duplicate submissions from causing duplicate completed effects. Demonstrate the behavior through the UI, status checks, and logs.
