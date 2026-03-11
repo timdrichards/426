@@ -5,6 +5,7 @@
     "publish": "./scripts/publish-website.sh",
     "publish:all": "./scripts/publish-website.sh",
     "publish:website": "./scripts/publish-website.sh",
+    "publish:canvas": "node ./scripts/publish-canvas-assignments.mjs",
     "build:all": "./scripts/build-all.sh",
     "generate:assignments-doc": "node ./scripts/generate-assignments-doc.js",
     "watch:site": "npm --prefix website run watch:site --",
